@@ -1,0 +1,75 @@
+.annotator-panel {
+    position: fixed;
+    top: 100px;
+    left: 20px;
+    width: 45px;
+    background-color: #293845;
+    border-radius: 8px;
+    padding: 8px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 5px;
+}
+
+#annotator-drag-handle {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    cursor: move;
+}
+
+.tool-button {
+    width: 100%;
+    padding: 4px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    display: flex;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.tool-button:not(.tool-button--selected):hover {
+    background: #4c5f6f;
+}
+
+.tool-button--selected {
+    background: #7234cd;
+}
+
+.tool-button__icon {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.tool-button>.icon {
+    max-width: 30px;
+    fill: #888888;
+}
+
+.tool-button>.stroked-icon {
+    fill: none;
+    stroke: #fff;
+}
+
+.tool-button--selected>.icon {
+    fill: #fff;
+}
+
+.tool-button--selected>.stroked-icon {
+    fill: none;
+    stroke: #fff;
+}
+
+.panel-drag-handle {
+    height: 15px;
+    width: 15px;
+}
+
+.panel-drag-handle>svg {
+    fill: #fff;
+}

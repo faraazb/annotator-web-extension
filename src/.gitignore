@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Parcel files
+dist/
+.parcel-cache/
+.cache/
+
+# System files
+.DS_Store

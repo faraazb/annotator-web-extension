@@ -1,0 +1,22 @@
+{
+  "name": "annotator-web-extension",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "parcel watch src/manifest.json --host localhost --config @parcel/config-webextension",
+    "build": "parcel build src/manifest.json --config @parcel/config-webextension"
+  },
+  "devDependencies": {
+    "@parcel/config-webextension": "^2.8.3",
+    "parcel": "^2.8.3"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.7",
+    "downshift": "^7.6.0",
+    "preact": "^10.13.1",
+    "react-draggable": "^4.4.5"
+  },
+  "alias": {
+    "react": "preact/compat",
+    "react-dom": "preact/compat"
+  }
+}
