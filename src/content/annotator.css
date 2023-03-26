@@ -24,15 +24,15 @@
 }
 
 #annotator-app-container {
-    position: absolute;
-    top: 0;
-    z-index: var(--layer0-z);
-    height: 100%;
-    width: 100%;
+    /* position: absolute; */
+    /* top: 0; */
+    /* z-index: var(--layer0-z); */
+    /* height: 100%; */
+    /* width: 100%; */
 }
 
 #annotator-tools-container {
     position: absolute;
     top: 0;
-    z-index: var(--layer1-z);
+    z-index: 10000001;
 }

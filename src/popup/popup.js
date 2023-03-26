@@ -2,9 +2,10 @@ import { h, render } from "preact";
 
 const Popup = () => {
 
-    const startMarkerr = async () => {
+    const startAnnotator = async () => {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        const response = await chrome.tabs.sendMessage(tab.id, { action: "INIT" });
+        const response = await chrome.tabs.sendMessage(tab.id, { action: "START_ANNOTATOR" });
+        window.close()
         // console.log(response);
     }
 
@@ -17,7 +18,7 @@ const Popup = () => {
         <main>
             <div id="markerr-popup">
                 <div>
-                    <button onClick={startMarkerr}>Annotate</button>
+                    <button onClick={startAnnotator}>Annotate</button>
                     <button onClick={loginWithGoogle}>Login with Google</button>
                 </div>
             </div>
