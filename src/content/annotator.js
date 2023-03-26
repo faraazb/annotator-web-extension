@@ -1,22 +1,12 @@
 import { initApp } from "../app";
+import { startInspectorMode } from "../lib/annotate"
 
-console.log("Content script loaded");
-
-
-let isAnnotatorInjected = false;
+console.log("content script loaded");
 
 // inject the app
-async function init() {
-    if (isAnnotatorInjected) {
-        return { ok: true };
-    }
-    try {
-        isAnnotatorInjected = true;
-        initApp();
-        return { ok: true };
-    } catch (err) {
-        return { ok: false, error: err.message };
-    }
+async function startAnnotator() {
+    initApp();
+    startInspectorMode()
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -34,6 +24,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // with the bg script which will usually make network requests, do async storage
 // operations, etc.
 const handlers = {
-    "INIT": init
+    "START_ANNOTATOR": startAnnotator
 }
 
