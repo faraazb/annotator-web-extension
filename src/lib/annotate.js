@@ -20,16 +20,6 @@ const canIgnore = (target) => {
     }
 };
 
-const canIgnore = (target) => {
-    const annotateParent = target.closest('[id^="annotator"]');
-
-    if (annotateParent) {
-        return true;
-    } else {
-        false;
-    }
-};
-
 const getInspectName = (element) => {
     return element.tagName.toLowerCase();
 };
@@ -64,10 +54,6 @@ export const exitInspectorMode = () => {
 const handleElementPointerOver = (e) => {
     const target = e.target;
     if (!target || !overlay) return;
-
-    if (canIgnore(target)) {
-        return;
-    }
 
     if (canIgnore(target)) {
         return;
