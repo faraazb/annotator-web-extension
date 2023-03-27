@@ -25,6 +25,9 @@ const Combobox = (props) => {
         highlightedIndex,
         getItemProps,
         selectedItem,
+        reset,
+        inputValue,
+        openMenu
     } = useCombobox({
         items: filteredItems,
         onSelectedItemChange: ({ selectedItem }) => {
@@ -67,14 +70,31 @@ const Combobox = (props) => {
 
     return (
         <div className="annotator-combobox">
-            <input
-                className={`annotator-combobox__input${
-                    inputClassName ? " " + inputClassName : ""
-                }`}
-                type="text"
-                placeholder="Add annotation"
-                {...getInputProps()}
-            />
+            <div style={{ position: 'relative' }} >
+                <input
+                    className={`annotator-combobox__input${inputClassName ? " " + inputClassName : ""
+                        }`}
+                    type="text"
+                    placeholder="Add annotation"
+                    {...getInputProps()}
+                />
+                <div style={{ position: 'absolute', right: "10px", top: "50%", transform: "translate(0, -50%)" }} >
+                    {inputValue.trim().length > 0 ? (
+                        <button onClick={() => reset()} style={{ background: '#fff', border: 'none', outline: 'none', width: '24px', height: '24px' }} >
+                            <svg style={{ width: 16, height: 16 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    ) : (
+                        <button onClick={() => openMenu()} style={{ background: '#fff', border: 'none', outline: 'none', width: '24px', height: '24px' }} >
+                            <svg style={{ width: 16, height: 16 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                    )}
+                </div>
+            </div>
+
             <ul
                 {...getMenuProps()}
                 className="annotator-combobox__menu"
@@ -95,9 +115,8 @@ const Combobox = (props) => {
                     isOpen &&
                     filteredItems.map((item, index) => (
                         <li
-                            className={`annotator-combobox__item${
-                                highlightedIndex === index ? " highlight" : ""
-                            }`}
+                            className={`annotator-combobox__item${highlightedIndex === index ? " highlight" : ""
+                                }`}
                             {...getItemProps({ item, index })}
                             key={`${item.value}${item.index}`}
                         >
