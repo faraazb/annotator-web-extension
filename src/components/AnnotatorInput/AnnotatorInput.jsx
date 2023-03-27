@@ -19,6 +19,13 @@ function getLabelsFilter(inputValue) {
 const AnnotatorInput = () => {
     const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
 
+
+    const handleSubmit = () => {
+        // this is not a good way to get the value, but it works for now
+        let value = document.querySelector(".annotator-combobox__input").value
+        console.log('The value is ',value);
+    }
+
     return (
         <div className="ai_container" >
             <Combobox
@@ -26,7 +33,6 @@ const AnnotatorInput = () => {
                 setItems={setItems}
                 setSelectedItem={setSelectedItem}
                 getFilter={getLabelsFilter}
-                allowCreation={true}
             />
             <div className="ai_btns_container" >
                 <div className="ai_btns_left" >
@@ -34,7 +40,7 @@ const AnnotatorInput = () => {
                 </div>
                 <div className="ai_btns_right" >
                     <button onClick={() => removeAnnotatorInput()} className="ai_btn_danger" >Cancel</button>
-                    <button className="ai_btn_primary" >Submit</button>
+                    <button onClick={handleSubmit} className="ai_btn_primary" >Submit</button>
                 </div>
             </div>
         </div>
