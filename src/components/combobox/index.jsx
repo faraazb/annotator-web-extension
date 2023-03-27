@@ -72,7 +72,7 @@ const Combobox = (props) => {
                     inputClassName ? " " + inputClassName : ""
                 }`}
                 type="text"
-                placeholder="Add a label"
+                placeholder="Add annotation"
                 {...getInputProps()}
             />
             <ul
