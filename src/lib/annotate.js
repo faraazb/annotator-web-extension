@@ -1,7 +1,7 @@
 import Overlay from '../lib/overlay'
 import { createPopper } from '@popperjs/core'
 import ComboboxExample from '../components/combobox/example'
-import {render} from 'preact'
+import { render } from 'preact'
 
 let overlay = null
 let inspecting = false
@@ -73,10 +73,10 @@ const handleElementClick = e => {
   }
 
 
-  if(localStorage.getItem("annotating") === "true") {
+  if (localStorage.getItem("annotating") === "true") {
     localStorage.removeItem("annotating");
     window.addEventListener("pointerover", handleElementPointerOver, true)
-    document.getElementById("tooltip").remove(); 
+    document.getElementById("tooltip").remove();
     return
   }
 
@@ -90,7 +90,7 @@ const handleElementClick = e => {
 
   createPopper(target, tooltip);
 
-  if(!localStorage.getItem("annotating")) {
+  if (!localStorage.getItem("annotating")) {
     localStorage.setItem("annotating", "true");
     window.removeEventListener("pointerover", handleElementPointerOver, true)
   }
@@ -108,4 +108,9 @@ window.addEventListener("keydown", handleEscape)
 window.addEventListener("mousemove", e => {
   mousePos.x = e.clientX
   mousePos.y = e.clientY
+})
+
+
+window.addEventListener('beforeunload', function() {
+  this.localStorage.removeItem("annotating");
 })
