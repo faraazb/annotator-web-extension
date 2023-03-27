@@ -1,8 +1,21 @@
 import Overlay from '../lib/overlay'
+import { createPopper } from '@popperjs/core'
 
 let overlay = null
 let inspecting = false
 const mousePos = { x: 0, y: 0 }
+
+
+const canIgnore = (target) => {
+  const annotateParent = target.closest('[id^="annotator"]');
+
+  if (annotateParent) {
+    return true
+  } else {
+    false
+  }
+}
+
 
 const getInspectName = element => {
   return element.tagName.toLowerCase()
@@ -38,6 +51,11 @@ export const exitInspectorMode = () => {
 const handleElementPointerOver = e => {
   const target = e.target
   if (!target || !overlay) return
+
+  if (canIgnore(target)) {
+    return
+  }
+
   overlay.inspect([target], getInspectName(target))
 }
 
@@ -47,7 +65,20 @@ const handleElementClick = e => {
   const target = e.target
   if (!target) return
 
-  console.log("clicked on ",target)
+
+  if (canIgnore(target)) {
+    return
+  }
+
+
+  let tooltip = document.createElement('div');
+  tooltip.id = "tooltip";
+  tooltip.innerHTML = "<input type='text' placeholder='Enter your annotation here' />";
+
+  let app_container = document.getElementById("annotator-app-container");
+  app_container.appendChild(tooltip);
+
+  createPopper(target, tooltip);
 }
 
 const handleEscape = e => {
@@ -63,5 +94,3 @@ window.addEventListener("mousemove", e => {
   mousePos.x = e.clientX
   mousePos.y = e.clientY
 })
-
-

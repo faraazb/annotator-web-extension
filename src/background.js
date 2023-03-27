@@ -7,9 +7,10 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener(
-    async (_info, tab) => {
+    async (_info, _tab) => {
         // info will have information about the cm clicked
-        const response = await chrome.tabs.sendMessage(tab.id, { action: "INIT" });
+        // const response = await chrome.tabs.sendMessage(tab.id, { action: "INIT" });
+        // console.log(response)
     }
 );
 
@@ -20,7 +21,7 @@ async function loginWithGoogle() {
 
 
 // Messaging
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     const { action, payload } = message;
     // if action has an associated handler, call it and return the result
     if (action in handlers) {
