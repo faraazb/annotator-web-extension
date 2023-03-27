@@ -17,13 +17,25 @@ function getLabelsFilter(inputValue) {
 }
 
 const AnnotatorInput = () => {
-    const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
+    // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
+    const [items, setItems] = useState(JSON.parse(localStorage.getItem("items")) || []);
 
+    let setLocalItems = (items) => {
+        setItems(items);
+        localStorage.setItem("items", JSON.stringify(items));
+    }
+
+    console.log("items ", items)
 
     const handleSubmit = () => {
-        // this is not a good way to get the value, but it works for now
+        // TODO: this is not a good way to get the value, but it works for now
         let value = document.querySelector(".annotator-combobox__input").value
-        console.log('The value is ',value);
+
+        if (!items.some((existingItem) => existingItem.value === value)) {
+            setLocalItems([...items, { title: value, value: value }]);
+        } 
+
+        removeAnnotatorInput()
     }
 
     return (
