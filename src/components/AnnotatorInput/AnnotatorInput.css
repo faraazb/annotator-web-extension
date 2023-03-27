@@ -1,0 +1,54 @@
+.ai_container {
+  background: white;
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,
+        rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+  padding: 8px;
+  border-radius: 4px;
+
+}
+
+.ai_btn_primary {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem; 
+  padding-left: 0.625rem;
+  padding-right: 0.625rem; 
+  background-color: rgb(114, 52, 205); 
+  color: #ffffff; 
+  font-size: 0.875rem;
+  line-height: 1.25rem; 
+  font-weight: 600; 
+  border-radius: 0.375rem; 
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
+  outline: none !important;
+  border: none !important;
+}
+
+
+.ai_btn_danger {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem; 
+  padding-left: 0.625rem;
+  padding-right: 0.625rem; 
+  font-size: 0.875rem;
+  line-height: 1.25rem; 
+  font-weight: 600; 
+  border-radius: 0.375rem; 
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
+  border: 1px solid #ef4444;
+  background: #fff;
+  color: #ef4444;
+  margin-right: 8px;
+}
+
+
+.ai_btns_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.ai_btns_right {
+  display: flex;
+  align-items: center;
+}

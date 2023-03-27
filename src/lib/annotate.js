@@ -1,7 +1,7 @@
 import Overlay from '../lib/overlay'
 import { createPopper } from '@popperjs/core'
-import ComboboxExample from '../components/combobox/example'
 import { render } from 'preact'
+import AnnotatorInput from '../components/AnnotatorInput/AnnotatorInput'
 
 let overlay = null
 let inspecting = false
@@ -74,21 +74,19 @@ const handleElementClick = e => {
 
 
   if (localStorage.getItem("annotating") === "true") {
-    localStorage.removeItem("annotating");
-    window.addEventListener("pointerover", handleElementPointerOver, true)
-    document.getElementById("tooltip").remove();
+    removeAnnotatorInput()
     return
   }
 
 
-  let tooltip = document.createElement('div');
-  tooltip.id = "tooltip";
-  render(<ComboboxExample />, tooltip)
+  let annotatorInput = document.createElement('div');
+  annotatorInput.id = "annotator-input";
+  render(<AnnotatorInput />, annotatorInput)
 
   let app_container = document.getElementById("annotator-app-container");
-  app_container.appendChild(tooltip);
+  app_container.appendChild(annotatorInput);
 
-  createPopper(target, tooltip);
+  createPopper(target, annotatorInput);
 
   if (!localStorage.getItem("annotating")) {
     localStorage.setItem("annotating", "true");
@@ -96,9 +94,17 @@ const handleElementClick = e => {
   }
 }
 
+export const removeAnnotatorInput = () => {
+  localStorage.removeItem("annotating");
+  window.addEventListener("pointerover", handleElementPointerOver, true)
+  document.getElementById("annotator-input").remove();
+}
+
+
 const handleEscape = e => {
   if (e.key?.toLowerCase() === "escape") {
     e.preventDefault()
+    removeAnnotatorInput();
     exitInspectorMode()
   }
 }
