@@ -7,7 +7,10 @@
         "activeTab",
         "tabs",
         "contextMenus",
-        "identity"
+        "identity",
+        "scripting",
+        "storage",
+        "unlimitedStorage"
     ],
     "host_permissions": [
         "https://*/*"
@@ -31,5 +34,6 @@
                 "./content/annotator.css"
             ]
         }
-    ]
+    ],
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqn6epXt5AMbPB1EvGLz5b85uHnLs6Ov7fG35cmRLBvOFZBmZNPgBvuaO4dqx8soTY9bUaagYYaZLjp5kevS4qKVe88w+q10kGIM7cmq0zka6cWLecj1MPYNeGINpIHu9lvcIGrkzY5PhLlWHmp05x0D3AvghbGrIYki4DXj9yLqXunTYYFmC0i/4vrPuwh/H/GkXpa65dy+SvCOhDJlXCvoo7pQ6i6wVEtLvBEtB+qIR6kknAsPYYrkhgHWCnvgtOeZGCjeIhXxmxjc+upqwsvGjiFrHvzlVSoRNqFakeHzSKdUQXGQl5Wyf/lNISup9yedGkfgA/p/8WoqcJ/4DtQIDAQAB"
 }
