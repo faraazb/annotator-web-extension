@@ -2,6 +2,7 @@ import { h, render } from "preact";
 // import ComboboxExample from "./components/combobox/example";
 import Tools from "./components/tools";
 
+
 const initApp = () => {
     const appContainer = document.createElement("div");
     // TODO probably randommize/mangle classes and IDs?
