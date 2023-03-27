@@ -6,10 +6,9 @@
 
 :root {
     --accent-primary: #7234cd;
-    --layer0-z: 999999;
-    /* App container - labels, etc.*/
-    --layer1-z: 9999999;
-    /* Tools container */
+    --layer0-z: 999999; /* App container - labels, etc.*/
+    --layer1-z: 9999999; /* Tools container */
+    --layer2-z: 10000001; /* Popup container */
 }
 
 .icon {
@@ -26,16 +25,16 @@
 
 #annotator-app-container {
     position: absolute;
-    top: 0;
-    z-index: var(--layer0-z);
-    height: 100%;
-    width: 100%;
+    /* top: 0; */
+    z-index: 10000001 !important;
+    /* height: 100%; */
+    /* width: 100%; */
 }
 
 #annotator-tools-container {
     position: absolute;
-    top: 0;
-    z-index: var(--layer1-z);
+    /* top: 0; */
+    z-index: 10000001 !important;
 }
 
 /* Fixes for screenshot capturing */

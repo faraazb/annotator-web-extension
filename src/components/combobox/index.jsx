@@ -64,6 +64,7 @@ const Combobox = (props) => {
         return true;
     };
 
+
     return (
         <div className="annotator-combobox">
             <input
@@ -77,7 +78,7 @@ const Combobox = (props) => {
             <ul
                 {...getMenuProps()}
                 className="annotator-combobox__menu"
-                style={{ display: isOpen ? "block" : "none" }}
+                style={{ display: isOpen && filteredItems.length > 0 ? "block" : "none" }}
                 data-open={isOpen}
             >
                 {isOpen && filteredItems.length === 0 ? (
