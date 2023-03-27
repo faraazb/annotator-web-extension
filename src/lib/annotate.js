@@ -81,7 +81,7 @@ const handleElementClick = e => {
 
   let annotatorInput = document.createElement('div');
   annotatorInput.id = "annotator-input";
-  render(<AnnotatorInput />, annotatorInput)
+  render(<AnnotatorInput element={target} />, annotatorInput)
 
   let app_container = document.getElementById("annotator-app-container");
   app_container.appendChild(annotatorInput);

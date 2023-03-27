@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate"
+import Overlay from "../../lib/overlay"
 import "./AnnotatorInput.css";
 
 const setSelectedItem = (selectedItem) => {
@@ -16,7 +17,7 @@ function getLabelsFilter(inputValue) {
     };
 }
 
-const AnnotatorInput = () => {
+const AnnotatorInput = ({ element }) => {
     // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
     const [items, setItems] = useState(JSON.parse(localStorage.getItem("items")) || []);
 
@@ -33,9 +34,16 @@ const AnnotatorInput = () => {
 
         if (!items.some((existingItem) => existingItem.value === value)) {
             setLocalItems([...items, { title: value, value: value }]);
-        } 
+        }
 
         removeAnnotatorInput()
+        let element_overlay = new Overlay(element, value);
+
+        if (element) {
+            element_overlay.inspect([element], value, element)
+        }
+
+        console.log("current element is ", element)
     }
 
     return (
