@@ -5,13 +5,14 @@ const Popup = () => {
     const startAnnotator = async () => {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         const response = await chrome.tabs.sendMessage(tab.id, { action: "START_ANNOTATOR" });
+        console.log(response)
         window.close()
         // console.log(response);
     }
 
     const loginWithGoogle = async () => {
         const response = await chrome.runtime.sendMessage({action: "LOGIN"});
-        // console.log(response);
+        console.log(response);
     }
 
     return (
