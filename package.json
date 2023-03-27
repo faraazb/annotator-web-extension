@@ -12,8 +12,12 @@
   "dependencies": {
     "@popperjs/core": "^2.11.7",
     "downshift": "^7.6.0",
+    "history": "^5.3.0",
     "preact": "^10.13.1",
-    "react-draggable": "^4.4.5"
+    "preact-router": "^4.1.0",
+    "react-draggable": "^4.4.5",
+    "react-popper": "^2.3.0",
+    "teaful": "^0.11.1"
   },
   "alias": {
     "react": "preact/compat",

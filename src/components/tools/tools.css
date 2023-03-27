@@ -10,7 +10,15 @@
     flex-direction: column;
     align-items: center;
     row-gap: 5px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 }
+
+.annotator-tools__buttons {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+}
+
 
 #annotator-drag-handle {
     width: 100%;
@@ -22,14 +30,19 @@
 
 .tool-button {
     width: 100%;
-    padding: 4px;
-    height: 30px;
+    padding: 6px;
+    height: 35px;
+    width: 35px;
     background: transparent;
     border: none;
     display: flex;
     justify-content: center;
     border-radius: 6px;
 }
+
+/* .tool-button:nth-last-child(1) {
+    margin-bottom: 5px;
+} */
 
 .tool-button:not(.tool-button--selected):hover {
     background: #4c5f6f;
@@ -72,4 +85,97 @@
 
 .panel-drag-handle>svg {
     fill: #fff;
+}
+
+.screenshot-sub-menu {
+    min-width: 75px;
+    width: max-content;
+    max-width: 200px;
+    border-radius: 5px;
+    background-color: #1F2B34;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+    position: relative;
+    z-index: 9999999;
+    font-size: 14px;
+}
+
+.screenshot-sub-menu-hover {
+    left: -8px;
+    /* background-color: red; */
+    height: 75px;
+    width: 20px;
+    position: fixed;
+}
+
+.ss-menu-button {
+    text-align: start;
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+}
+
+.screenshot-sub-menu__items {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.screenshot-sub-menu__item {
+    list-style-type: none !important;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.ss-menu-button__icon {
+    width: 18px;
+    height: auto;
+    display: flex;
+    align-items: center;
+}
+
+.screenshot-sub-menu__item:hover {
+    /* background-color: #4c5f6f; */
+    /* background-color: #1fa0be; */
+    background-color: #7234cd;
+}
+
+#arrow,
+#arrow::before {
+    background-color: #1F2B34;
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    left: -2px;
+}
+
+#arrow {
+    visibility: hidden;
+}
+
+#arrow::before {
+    visibility: visible;
+    content: '';
+    transform: rotate(45deg);
+}
+
+#annotator-screenshot-menu[data-popper-placement^='left']>.screenshot-sub-menu-hover {
+    left: initial;
+    right: -8px;
+}
+
+
+#annotator-screenshot-menu[data-popper-placement^='left']>#arrow {
+    left: 94%;
+}
+
+#annotator-screenshot-menu[data-popper-placement^='right']>#arrow {
+    left: -2px;
 }
