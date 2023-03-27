@@ -1,5 +1,6 @@
 .annotator-combobox {
     user-select: none;
+    position: relative;
 }
 
 .annotator-combobox__input {
