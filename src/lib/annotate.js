@@ -1,5 +1,7 @@
 import Overlay from '../lib/overlay'
 import { createPopper } from '@popperjs/core'
+import ComboboxExample from '../components/combobox/example'
+import {render} from 'preact'
 
 let overlay = null
 let inspecting = false
@@ -61,7 +63,7 @@ const handleElementPointerOver = e => {
 
 const handleElementClick = e => {
   e.preventDefault()
-  // exitInspectorMode()
+
   const target = e.target
   if (!target) return
 
@@ -71,14 +73,27 @@ const handleElementClick = e => {
   }
 
 
+  if(localStorage.getItem("annotating") === "true") {
+    localStorage.removeItem("annotating");
+    window.addEventListener("pointerover", handleElementPointerOver, true)
+    document.getElementById("tooltip").remove(); 
+    return
+  }
+
+
   let tooltip = document.createElement('div');
   tooltip.id = "tooltip";
-  tooltip.innerHTML = "<input type='text' placeholder='Enter your annotation here' />";
+  render(<ComboboxExample />, tooltip)
 
   let app_container = document.getElementById("annotator-app-container");
   app_container.appendChild(tooltip);
 
   createPopper(target, tooltip);
+
+  if(!localStorage.getItem("annotating")) {
+    localStorage.setItem("annotating", "true");
+    window.removeEventListener("pointerover", handleElementPointerOver, true)
+  }
 }
 
 const handleEscape = e => {
