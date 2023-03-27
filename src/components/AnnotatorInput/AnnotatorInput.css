@@ -72,3 +72,42 @@
     justify-content: center;
     outline: none !important;
 }
+
+
+#arrow,
+#arrow::before {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+}
+
+#arrow {
+  visibility: hidden;
+  background: white;
+}
+
+#arrow::before {
+  visibility: visible;
+  content: '';
+  transform: rotate(45deg);
+}
+
+#annotator-input[data-popper-placement^='top'] > #arrow {
+  bottom: -4px;
+}
+
+#annotator-input[data-popper-placement^='bottom'] > #arrow {
+  top: -4px;
+}
+
+#annotator-input[data-popper-placement^='left'] > #arrow {
+  right: -4px;
+}
+
+#annotator-input[data-popper-placement^='right'] > #arrow {
+  left: -4px;
+}
+
+
+

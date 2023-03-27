@@ -84,7 +84,16 @@ const handleElementClick = (e) => {
     let app_container = document.getElementById("annotator-app-container");
     app_container.appendChild(annotatorInput);
 
-    createPopper(target, annotatorInput);
+    createPopper(target, annotatorInput, {
+        modifiers: [
+            {
+                name: "offset",
+                options: {
+                    offset: [0, 8],
+                }
+            }
+        ]
+    });
 
     if (!localStorage.getItem("annotating")) {
         localStorage.setItem("annotating", "true");
@@ -117,9 +126,9 @@ window.addEventListener("mousemove", (e) => {
     mousePos.y = e.clientY;
 });
 
-window.addEventListener("beforeunload", function () {
+window.addEventListener("beforeunload", function() {
     this.localStorage.removeItem("annotating");
 });
-window.addEventListener("beforeunload", function () {
+window.addEventListener("beforeunload", function() {
     this.localStorage.removeItem("annotating");
 });

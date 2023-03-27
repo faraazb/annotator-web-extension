@@ -12,7 +12,7 @@ const setSelectedItem = (selectedItem) => {
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function ({ title, _value }) {
+    return function({ title, _value }) {
         return (
             !inputValue || title.toLowerCase().includes(lowerCasedInputValue)
         );
@@ -92,34 +92,38 @@ const AnnotatorInput = ({ element }) => {
     };
 
     return (
-        <div className="annotator_input_container">
-            <Combobox
-                items={items}
-                setItems={setItems}
-                setSelectedItem={setSelectedItem}
-                getFilter={getLabelsFilter}
-            />
-            <div className="annotator_input_btns_container">
-                <div>
-                    <Checkbox />
+        <>
+            <div className="annotator_input_container">
+                <Combobox
+                    items={items}
+                    setItems={setItems}
+                    setSelectedItem={setSelectedItem}
+                    getFilter={getLabelsFilter}
+                />
+                <div className="annotator_input_btns_container">
+                    <div>
+                        <Checkbox />
+                    </div>
+
+                    <div className="annotator_input_btns">
+                        <button
+                            onClick={() => removeAnnotatorInput()}
+                            className="annotator_input_btn_danger"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSubmit}
+                            className="annotator_input_btn_primary"
+                        >
+                            Submit
+                        </button>
+                    </div>
                 </div>
 
-                <div className="annotator_input_btns">
-                    <button
-                        onClick={() => removeAnnotatorInput()}
-                        className="annotator_input_btn_danger"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        className="annotator_input_btn_primary"
-                    >
-                        Submit
-                    </button>
-                </div>
             </div>
-        </div>
+            <div id="arrow" data-popper-arrow></div>
+        </>
     );
 };
 
