@@ -161,13 +161,18 @@ class OverlayRect {
 
 
     if (annotated) {
-      let background = 'red'
-      this.content.style.backgroundColor = background
-      this.border.style.borderColor = background
-      this.padding.style.borderColor = background
+      this.content.style.backgroundColor = 'transparent'
+      this.border.style.borderColor = 'transparent'
+      this.padding.style.borderColor = 'transparent'
+
+      // this.border.style.border = '2px solid green'
+      // this.node.style.border = '2px solid red'
+      // this.padding.style.border = '2px solid blue'
+      this.content.style.border = '2px solid rgb(114, 52, 205)'
+
 
       assign(this.node.style, {
-        borderColor: background,
+        // borderColor: background,
         pointerEvents: "none",
         position: "absolute",
       })
@@ -175,6 +180,7 @@ class OverlayRect {
       this.content.style.backgroundColor = overlayStyles.background
       this.border.style.borderColor = overlayStyles.border
       this.padding.style.borderColor = overlayStyles.padding
+
       assign(this.node.style, {
         borderColor: overlayStyles.margin,
         pointerEvents: "none",
