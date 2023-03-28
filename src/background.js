@@ -1,3 +1,5 @@
+import { getUserInfo, login, logout } from "./oauth";
+
 // Context Menu
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
@@ -15,8 +17,60 @@ chrome.contextMenus.onClicked.addListener(
 );
 
 
-async function loginWithGoogle() {
-    return { ok: true }
+async function loginGoogle() {
+    try {
+        const token = await login();
+        // TODO token is unused in getUserInfo
+        const result = await getUserInfo(token);
+        if (result) {
+            await chrome.storage.local.set({ user: result });
+            return { ok: true, data: result }
+        } else {
+            return { ok: false };
+        }
+    } catch (err) {
+        console.log(err)
+        return { ok: false, error: err };
+    }
+}
+
+async function logoutGoogle() {
+    try {
+        const result = await logout();
+        console.log(result)
+        if (result) {
+            await chrome.storage.local.remove("user");
+            return { ok: result }
+        }
+    } catch (err) {
+        console.log(err)
+        return { ok: false, error: err };
+    }
+}
+
+
+async function createTab(options) {
+    const tab = await chrome.tabs.create(options);
+    return tab;
+}
+
+async function queryTabs(query) {
+    try {
+        const tabs = await chrome.tabs.query(query);
+        return { ok: true, tabs };
+    } catch (err) {
+        return { ok: false, error: err.message }
+    }
+}
+
+
+async function captureVisibleTab(options = { format: "png" }) {
+    try {
+        const dataURI = await chrome.tabs.captureVisibleTab(options);
+        return { ok: true, dataURI };
+    } catch (err) {
+        return { ok: false };
+    }
 }
 
 
@@ -34,5 +88,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 // each handler must be an async fucntion or return a Promise
 const handlers = {
-    "LOGIN": loginWithGoogle
+    "LOGIN": loginGoogle,
+    "LOGOUT": logoutGoogle,
+    "CREATE_TAB": createTab,
+    "QUERY_TABS": queryTabs,
+    "CAPTURE_TAB": captureVisibleTab
 }

@@ -1,27 +1,30 @@
 import { h, render } from "preact";
+import { useEffect } from "preact/hooks";
+import Router from "preact-router";
+import history from "./history";
+import { useStore } from "../store";
+import Home from "./pages/home";
+import "./popup.css";
+
 
 const Popup = () => {
+    const [user, setUser] = useStore.user();
 
-    const startAnnotator = async () => {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        const response = await chrome.tabs.sendMessage(tab.id, { action: "START_ANNOTATOR" });
-        console.log(response)
-        window.close()
-        // console.log(response);
-    }
-
-    const loginWithGoogle = async () => {
-        const response = await chrome.runtime.sendMessage({action: "LOGIN"});
-        console.log(response);
-    }
+    useEffect(() => {
+        (async function () {
+            const result = await chrome.storage.local.get("user");
+            if ("user" in result) {
+                setUser(result.user);
+            }
+        })();
+    }, []);
 
     return (
         <main>
-            <div id="markerr-popup">
-                <div>
-                    <button onClick={startAnnotator}>Annotate</button>
-                    <button onClick={loginWithGoogle}>Login with Google</button>
-                </div>
+            <div id="markerr-popup" className="popup">
+                <Router history={history}>
+                    <Home path="/"/>
+                </Router>
             </div>
         </main>
     )
