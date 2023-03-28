@@ -160,19 +160,21 @@ class OverlayRect {
     this.content = doc.createElement("div")
 
 
+    // this.node.id = 'node'
+    // this.border.id = 'border'
+    // this.padding.id = 'padding'
+    // this.content.id = 'content'
+
+
     if (annotated) {
-      this.content.style.backgroundColor = 'transparent'
-      this.border.style.borderColor = 'transparent'
-      this.padding.style.borderColor = 'transparent'
-
-      // this.border.style.border = '2px solid green'
-      // this.node.style.border = '2px solid red'
-      // this.padding.style.border = '2px solid blue'
-      this.content.style.border = '2px solid rgb(114, 52, 205)'
-
+      let annotated_color = 'rgba(114, 52, 205, 0.5)'
+      
+      this.content.style.backgroundColor = annotated_color
+      this.border.style.borderColor = annotated_color
+      this.padding.style.borderColor = annotated_color
 
       assign(this.node.style, {
-        // borderColor: background,
+        borderColor: annotated_color,
         pointerEvents: "none",
         position: "absolute",
       })
@@ -365,7 +367,7 @@ export default class Overlay {
 
       let updatedBox = null;
 
-      if(annotated) {
+      if (annotated) {
         updatedBox = {
           top: box.top + this.window.scrollY,
           left: box.left + this.window.scrollX,

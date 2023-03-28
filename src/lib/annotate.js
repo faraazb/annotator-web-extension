@@ -16,7 +16,7 @@ const canIgnore = (target) => {
     if (annotateParent) {
         return true;
     } else {
-        false;
+        return false;
     }
 };
 

@@ -5,6 +5,7 @@ import Overlay from "../../lib/overlay";
 import { signal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
+import { findSimilarElements } from "../../lib/similar";
 
 const setSelectedItem = (selectedItem) => {
     console.log(selectedItem);
@@ -107,9 +108,17 @@ const AnnotatorInput = ({ element }) => {
 
         removeAnnotatorInput();
 
+        let similar_elements = [];
+
+        if (checked_signal.value) {
+            similar_elements = [...findSimilarElements(element)]
+        }
+
+        console.log("similar_elements", similar_elements)
+
         let element_overlay = new Overlay(element, input);
         if (element) {
-            element_overlay.inspect([element], input, element);
+            element_overlay.inspect([element, ...similar_elements], input, true);
         }
     };
 
