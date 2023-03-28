@@ -272,7 +272,7 @@ const CaptureAPI = (function () {
 
     function getPositions(callback, takeScreenshot) {
         preScreenshotCleanup();
-        
+
         let body = document.body,
             originalBodyOverflowYStyle = body ? body.style.overflowY : "",
             originalX = window.scrollX,
@@ -404,12 +404,10 @@ const CaptureAPI = (function () {
             const computedStyle = window.getComputedStyle(element);
             element.style.transition = "none";
             if (computedStyle.getPropertyValue("position") === "sticky") {
-                console.log(element)
                 element.classList.add("annotator-screenshot-fix", "annotator-fix--sticky");
                 // element.style.position = "relative";
                 // element.style.inset = "auto";
             } else if (computedStyle.getPropertyValue("position") === "fixed") {
-                console.log(element)
                 element.classList.add("annotator-screenshot-fix", "annotator-fix--fixed");
                 // element.style.position = "absolute";
             }
@@ -417,7 +415,6 @@ const CaptureAPI = (function () {
     }
 
     function postScreenshotCleanup() {
-        console.log("Cleaning up after screenshot")
         const elements = document.querySelectorAll(".annotator-screenshot-fix");
         elements.forEach((element) => {
             element.classList.remove("annotator-screenshot-fix", "annotator-fix--sticky", "annotator-fix--fixed");
