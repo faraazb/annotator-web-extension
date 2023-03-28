@@ -257,8 +257,8 @@ class OverlayTip {
     assign(this.nameSpan.style, {
       color: "#ee78e6",
       borderRight: "1px solid #aaaaaa",
-      paddingRight: "0.5rem",
-      marginRight: "0.5rem"
+      paddingRight: "8px",
+      marginRight: "8px"
     })
     this.dimSpan = doc.createElement("span")
     this.tip.appendChild(this.dimSpan)
