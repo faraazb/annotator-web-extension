@@ -11,23 +11,21 @@ const Combobox = (props) => {
         getFilter,
         allowCreation = false,
         classNames = {},
+        defaultSelectedItemTitle
     } = props;
     // TODO unused classnames props, maybe get rid of this
-    const { inputClassName, menuClassName, menuItemClassName } = classNames;
+    const { inputClassName  } = classNames;
     const [filteredItems, setFilteredItems] = useState(items || []);
 
     const {
         isOpen,
-        getToggleButtonProps,
-        getLabelProps,
         getMenuProps,
         getInputProps,
         highlightedIndex,
         getItemProps,
-        selectedItem,
         reset,
         inputValue,
-        openMenu
+        openMenu,
     } = useCombobox({
         items: filteredItems,
         onSelectedItemChange: ({ selectedItem }) => {
@@ -54,7 +52,9 @@ const Combobox = (props) => {
                     return changes;
                 }
             }
+        
         },
+        defaultSelectedItem: defaultSelectedItemTitle ? items.find((item) => item.title === defaultSelectedItemTitle) : null
     });
 
     const addItem = (item) => {

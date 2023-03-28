@@ -66,6 +66,7 @@ const Checkbox = () => {
 
 const AnnotatorInput = ({ element }) => {
     // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
+    /** @type [{title: string, value: {x: string, y: string}[]}[], any]*/
     const [items, setItems] = useState(
         JSON.parse(localStorage.getItem("items")) || []
     );
@@ -77,17 +78,38 @@ const AnnotatorInput = ({ element }) => {
 
     const handleSubmit = () => {
         // TODO: this is not a good way to get the value, but it works for now
-        let value = document.querySelector(".annotator-combobox__input").value;
+        let input = document.querySelector(".annotator-combobox__input").value;
+        let x = element.getBoundingClientRect().x + window.scrollX;
+        let y = element.getBoundingClientRect().y + window.scrollY;
 
-        if (!items.some((existingItem) => existingItem.value === value)) {
-            setLocalItems([...items, { title: value, value: value }]);
+        if (items.some((item) => item.title === input)) {
+            let newItems = items.map((item) => {
+                if (item.title === input) {
+                    return {
+                        ...item,
+                        value: [...item.value, { x, y }]
+                    }
+
+                } else {
+                    return item
+                }
+            })
+            setLocalItems(newItems)
+        } else {
+            setLocalItems([...items, {
+                title: input,
+                value: [{ x, y }]
+            }])
         }
 
-        removeAnnotatorInput();
-        let element_overlay = new Overlay(element, value);
+        element.setAttribute("data-annotate-title", input);
+        element.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
 
+        removeAnnotatorInput();
+
+        let element_overlay = new Overlay(element, input);
         if (element) {
-            element_overlay.inspect([element], value, element);
+            element_overlay.inspect([element], input, element);
         }
     };
 
@@ -95,6 +117,7 @@ const AnnotatorInput = ({ element }) => {
         <>
             <div className="annotator_input_container">
                 <Combobox
+                    defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
                     setSelectedItem={setSelectedItem}
