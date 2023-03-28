@@ -229,10 +229,8 @@ const CaptureAPI = (function () {
             return result;
         }
 
-
-        preScreenshotCleanup();
+        // calculate positions and take screenshots
         getPositions(() => callback(getBlobs(SCREENSHOTS)), takeScreenshot);
-        postScreenshotCleanup();
     }
 
     function captureToFiles(
@@ -273,6 +271,8 @@ const CaptureAPI = (function () {
     }
 
     function getPositions(callback, takeScreenshot) {
+        preScreenshotCleanup();
+
         let body = document.body,
             originalBodyOverflowYStyle = body ? body.style.overflowY : "",
             originalX = window.scrollX,
@@ -358,6 +358,7 @@ const CaptureAPI = (function () {
         (function processArrangements() {
             if (!arrangements.length) {
                 cleanUp();
+                postScreenshotCleanup();
                 if (callback) {
                     callback();
                 }
