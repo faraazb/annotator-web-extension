@@ -168,7 +168,7 @@ class OverlayRect {
 
     if (annotated) {
       let annotated_color = 'rgba(114, 52, 205, 0.5)'
-      
+
       this.content.style.backgroundColor = annotated_color
       this.border.style.borderColor = annotated_color
       this.padding.style.borderColor = annotated_color
@@ -235,10 +235,10 @@ class OverlayRect {
 }
 
 class OverlayTip {
-  constructor(doc, container) {
+  constructor(doc, container, annotate) {
     this.tip = doc.createElement("div")
     assign(this.tip.style, {
-      display: "flex",
+      display: annotate ? "none" : "flex",
       flexFlow: "row nowrap",
       backgroundColor: "#333740",
       borderRadius: "2px",
@@ -295,7 +295,7 @@ class OverlayTip {
 }
 
 export default class Overlay {
-  constructor() {
+  constructor({ disableTip } = { disableTip: false }) {
     // Find the root window, because overlays are positioned relative to it.
     const currentWindow = window
     this.window = currentWindow
@@ -308,8 +308,11 @@ export default class Overlay {
     this.container = doc.createElement("div")
     this.container.style.zIndex = "10000000"
 
-    this.tip = new OverlayTip(doc, this.container)
+    this.disableTip = disableTip || false
+
+    this.tip = new OverlayTip(doc, this.container, this.disableTip)
     this.rects = []
+
 
     doc.body.appendChild(this.container)
   }
