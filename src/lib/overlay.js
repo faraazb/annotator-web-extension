@@ -153,21 +153,43 @@ const assign = Object.assign
 // The colors below were chosen to roughly match those used by Chrome devtools.
 
 class OverlayRect {
-  constructor(doc, container) {
+  constructor(doc, container, annotated) {
     this.node = doc.createElement("div")
     this.border = doc.createElement("div")
     this.padding = doc.createElement("div")
     this.content = doc.createElement("div")
 
-    this.border.style.borderColor = overlayStyles.border
-    this.padding.style.borderColor = overlayStyles.padding
-    this.content.style.backgroundColor = overlayStyles.background
 
-    assign(this.node.style, {
-      borderColor: overlayStyles.margin,
-      pointerEvents: "none",
-      position: "fixed"
-    })
+    // this.node.id = 'node'
+    // this.border.id = 'border'
+    // this.padding.id = 'padding'
+    // this.content.id = 'content'
+
+
+    if (annotated) {
+      let annotated_color = 'rgba(114, 52, 205, 0.5)'
+
+      this.content.style.backgroundColor = annotated_color
+      this.border.style.borderColor = annotated_color
+      this.padding.style.borderColor = annotated_color
+
+      assign(this.node.style, {
+        borderColor: annotated_color,
+        pointerEvents: "none",
+        position: "absolute",
+      })
+    } else {
+      this.content.style.backgroundColor = overlayStyles.background
+      this.border.style.borderColor = overlayStyles.border
+      this.padding.style.borderColor = overlayStyles.padding
+
+      assign(this.node.style, {
+        borderColor: overlayStyles.margin,
+        pointerEvents: "none",
+        position: "fixed"
+      })
+    }
+
 
     this.node.style.zIndex = "10000000"
 
@@ -213,10 +235,10 @@ class OverlayRect {
 }
 
 class OverlayTip {
-  constructor(doc, container) {
+  constructor(doc, container, annotate) {
     this.tip = doc.createElement("div")
     assign(this.tip.style, {
-      display: "flex",
+      display: annotate ? "none" : "flex",
       flexFlow: "row nowrap",
       backgroundColor: "#333740",
       borderRadius: "2px",
@@ -235,8 +257,8 @@ class OverlayTip {
     assign(this.nameSpan.style, {
       color: "#ee78e6",
       borderRight: "1px solid #aaaaaa",
-      paddingRight: "0.5rem",
-      marginRight: "0.5rem"
+      paddingRight: "8px",
+      marginRight: "8px"
     })
     this.dimSpan = doc.createElement("span")
     this.tip.appendChild(this.dimSpan)
@@ -273,7 +295,7 @@ class OverlayTip {
 }
 
 export default class Overlay {
-  constructor() {
+  constructor({ disableTip } = { disableTip: false }) {
     // Find the root window, because overlays are positioned relative to it.
     const currentWindow = window
     this.window = currentWindow
@@ -286,8 +308,11 @@ export default class Overlay {
     this.container = doc.createElement("div")
     this.container.style.zIndex = "10000000"
 
-    this.tip = new OverlayTip(doc, this.container)
+    this.disableTip = disableTip || false
+
+    this.tip = new OverlayTip(doc, this.container, this.disableTip)
     this.rects = []
+
 
     doc.body.appendChild(this.container)
   }
@@ -303,7 +328,7 @@ export default class Overlay {
     }
   }
 
-  inspect(nodes, name) {
+  inspect(nodes, name, annotated) {
     // We can't get the size of text nodes or comment nodes. React as of v15
     // heavily uses comment nodes to delimit text.
     const elements = nodes.filter(node => node.nodeType === Node.ELEMENT_NODE)
@@ -317,7 +342,7 @@ export default class Overlay {
     }
 
     while (this.rects.length < elements.length) {
-      this.rects.push(new OverlayRect(this.window.document, this.container))
+      this.rects.push(new OverlayRect(this.window.document, this.container, annotated))
     }
 
     const outerBox = {
@@ -342,7 +367,23 @@ export default class Overlay {
       outerBox.left = Math.min(outerBox.left, box.left - dims.marginLeft)
 
       const rect = this.rects[index]
-      rect.update(box, dims)
+
+      let updatedBox = null;
+
+      if (annotated) {
+        updatedBox = {
+          top: box.top + this.window.scrollY,
+          left: box.left + this.window.scrollX,
+          right: box.right,
+          bottom: box.bottom,
+          width: box.width,
+          height: box.height
+        }
+      }
+
+      let final = updatedBox || box;
+
+      rect.update(final, dims)
     })
 
     this.tip.updateText(

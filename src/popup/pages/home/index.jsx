@@ -10,8 +10,9 @@ const Home = () => {
             currentWindow: true,
         });
         const response = await chrome.tabs.sendMessage(tab.id, {
-            action: "INIT",
+            action: "START_ANNOTATOR",
         });
+        window.close()
     };
 
     const loginWithGoogle = async () => {
