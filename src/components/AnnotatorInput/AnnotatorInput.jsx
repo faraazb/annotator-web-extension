@@ -80,15 +80,38 @@ const AnnotatorInput = ({ element }) => {
     const handleSubmit = () => {
         // TODO: this is not a good way to get the value, but it works for now
         let input = document.querySelector(".annotator-combobox__input").value;
-        let x = element.getBoundingClientRect().x + window.scrollX;
-        let y = element.getBoundingClientRect().y + window.scrollY;
+
+        if (input.trim() === "") {
+            return;
+        }
+
+        if (element.getAttribute("data-annotate-title") === input) {
+            return removeAnnotatorInput();
+        }
+
+        let similar_elements = findSimilarElements(element)
+        similar_elements = similar_elements .filter((e) => !e.getAttribute("data-annotate.title"));
+
+
+        let all_elements = [element, ...similar_elements]
+        let xys = [];
+
+        all_elements.forEach((ele) => {
+            let x = ele.getBoundingClientRect().x + window.scrollX;
+            let y = ele.getBoundingClientRect().y + window.scrollY;
+
+            xys.push({ x, y })
+
+            ele.setAttribute("data-annotate-title", input);
+            ele.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
+        })
 
         if (items.some((item) => item.title === input)) {
             let newItems = items.map((item) => {
                 if (item.title === input) {
                     return {
                         ...item,
-                        value: [...item.value, { x, y }]
+                        value: [...item.value, ...xys]
                     }
 
                 } else {
@@ -99,27 +122,15 @@ const AnnotatorInput = ({ element }) => {
         } else {
             setLocalItems([...items, {
                 title: input,
-                value: [{ x, y }]
+                value: [...xys]
             }])
         }
 
-        element.setAttribute("data-annotate-title", input);
-        element.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
+
+        let element_overlay = new Overlay({ disableTip: true });
+        element_overlay.inspect(all_elements, input, true);
 
         removeAnnotatorInput();
-
-        let similar_elements = [];
-
-        if (checked_signal.value) {
-            similar_elements = [...findSimilarElements(element)]
-        }
-
-        console.log("similar_elements", similar_elements)
-
-        let element_overlay = new Overlay(element, input);
-        if (element) {
-            element_overlay.inspect([element, ...similar_elements], input, true);
-        }
     };
 
     return (
