@@ -87,6 +87,9 @@
     fill: #fff;
 }
 
+
+/* Screenhot sub menu */
+
 .screenshot-sub-menu {
     min-width: 75px;
     width: max-content;
@@ -135,7 +138,7 @@
 }
 
 .ss-menu-button__icon {
-    width: 18px;
+    width: 16px;
     height: auto;
     display: flex;
     align-items: center;
@@ -147,8 +150,8 @@
     background-color: #7234cd;
 }
 
-#arrow,
-#arrow::before {
+#annotator-screenshot-menu-arrow,
+#annotator-screenshot-menu-arrow::before {
     background-color: #1F2B34;
     position: absolute;
     width: 14px;
@@ -156,11 +159,11 @@
     left: -2px;
 }
 
-#arrow {
+#annotator-screenshot-menu-arrow {
     visibility: hidden;
 }
 
-#arrow::before {
+#annotator-screenshot-menu-arrow::before {
     visibility: visible;
     content: '';
     transform: rotate(45deg);
@@ -172,10 +175,10 @@
 }
 
 
-#annotator-screenshot-menu[data-popper-placement^='left']>#arrow {
+#annotator-screenshot-menu[data-popper-placement^='left']>#annotator-screenshot-menu-arrow {
     left: 94%;
 }
 
-#annotator-screenshot-menu[data-popper-placement^='right']>#arrow {
+#annotator-screenshot-menu[data-popper-placement^='right']>#annotator-screenshot-menu-arrow {
     left: -2px;
 }

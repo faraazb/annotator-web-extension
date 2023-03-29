@@ -2,7 +2,16 @@ import { useEffect, useState } from "preact/hooks";
 import Draggable from "react-draggable";
 import { usePopper } from "react-popper";
 import useScreenshot from "../../hooks/use-screenshot";
-import { DragHandle, Save, Screenshot, Spline } from "../icons";
+import { exitInspectorMode, startInspectorMode } from "../../lib/annotate";
+import {
+    Camera,
+    Download,
+    DragHandle,
+    Save,
+    Screenshot,
+    SendPlane,
+    Spline,
+} from "../icons";
 import "./tools.css";
 
 const Tools = () => {
@@ -28,7 +37,12 @@ const Tools = () => {
     });
 
     const takeFullPageScreenshot = async () => {
+        // disable pointer events to prevent hover styles
         document.body.style.pointerEvents = "none";
+
+        // stop element inspector
+        exitInspectorMode();
+
         setOpen(false);
         const { ok, tabs } = await chrome.runtime.sendMessage({
             action: "QUERY_TABS",
@@ -37,13 +51,14 @@ const Tools = () => {
         if (ok) {
             await takeScreenshot({ tab: tabs[0] });
         }
+        startInspectorMode();
     };
 
     const tools = [
         { id: 3, Icon: <Spline /> },
         {
             id: 4,
-            Icon: <Screenshot />,
+            Icon: <Camera />,
             styles: { cursor: "default" },
             onClick: () => {},
             ref: setReferenceElement,
@@ -53,16 +68,15 @@ const Tools = () => {
     ];
 
     useEffect(() => {
-        const appContainer = document.getElementById("annotator-app-container");
-        if (appContainer) {
-            appContainer.addEventListener("mouseenter", () => setScreenshotMenuOpen(false));
-        }
+        document.body.addEventListener("mouseenter", () =>
+            setScreenshotMenuOpen(false)
+        );
 
         return () => {
-            if (appContainer) {
-                appContainer.removeEventListener("mouseenter", () => setScreenshotMenuOpen(false));
-            }
-        }
+            document.body.removeEventListener("mouseenter", () =>
+                setScreenshotMenuOpen(false)
+            );
+        };
     }, []);
 
     useEffect(() => {
@@ -137,7 +151,7 @@ const Tools = () => {
                                 <div
                                     ref={setArrowElement}
                                     style={styles.arrow}
-                                    id="arrow"
+                                    id="annotator-screenshot-menu-arrow"
                                 />
                                 <div
                                     className="screenshot-sub-menu-hover"
@@ -158,17 +172,17 @@ const Tools = () => {
                                                 onClick={takeFullPageScreenshot}
                                             >
                                                 <span className="ss-menu-button__icon">
-                                                    <Save />
+                                                    <Download />
                                                 </span>
-                                                Save
+                                                Save locally
                                             </button>
                                         </li>
                                         <li className="screenshot-sub-menu__item">
                                             <button className="ss-menu-button">
                                                 <span className="ss-menu-button__icon">
-                                                    <Screenshot />
+                                                    <SendPlane />
                                                 </span>
-                                                Save somewhere
+                                                Send to server
                                             </button>
                                         </li>
                                     </ul>
