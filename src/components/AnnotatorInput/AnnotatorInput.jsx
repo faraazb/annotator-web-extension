@@ -34,8 +34,8 @@ const Checkbox = () => {
                 onClick={handleClick}
                 style={
                     checked_signal.value && {
-                        backgroundColor: "rgb(114, 52, 205)",
-                        borderColor: "rgb(114, 52, 205)",
+                        backgroundColor: "#7c4dff",
+                        borderColor: "#7c4dff",
                     }
                 }
             >
@@ -57,7 +57,7 @@ const Checkbox = () => {
             </button>
             <label
                 onClick={handleClick}
-                style={{ fontSize: "14px", userSelect: "none" }}
+                className="checkbox_label"
             >
                 Annotate similar elements
             </label>
@@ -90,7 +90,7 @@ const AnnotatorInput = ({ element }) => {
         }
 
         let similar_elements = findSimilarElements(element)
-        similar_elements = similar_elements .filter((e) => !e.getAttribute("data-annotate.title"));
+        similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate.title"));
 
 
         let all_elements = [element, ...similar_elements]
@@ -159,7 +159,7 @@ const AnnotatorInput = ({ element }) => {
                             onClick={handleSubmit}
                             className="annotator_input_btn_primary"
                         >
-                            Submit
+                            Annotate
                         </button>
                     </div>
                 </div>

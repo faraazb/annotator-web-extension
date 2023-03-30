@@ -11,13 +11,12 @@
     padding-bottom: 6px;
     padding-left: 10px;
     padding-right: 10px;
-    background-color: rgb(114, 52, 205);
+    background-color: #7c4dff;
     color: #ffffff;
     font-size: 14px;
     line-height: 20px;
     font-weight: 600;
     border-radius: 6px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     outline: none !important;
     border: none !important;
     cursor: pointer !important;
@@ -32,12 +31,12 @@
     line-height: 20px;
     font-weight: 600;
     border-radius: 6px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid #ef4444;
-    background: #fff;
-    color: #ef4444;
+    background: #ffffff;
+    color: #4a556d;
     margin-right: 8px;
     cursor: pointer;
+    border: none !important;
+    outline: none !important;
 }
 
 .annotator_input_btns_container {
@@ -49,7 +48,7 @@
 .annotator_input_btns {
     display: flex;
     margin-left: auto;
-    margin-top: 8px;
+    margin-top: 24px;
 }
 
 .annotator_checkbox_container {
@@ -75,6 +74,11 @@
     outline: none !important;
 }
 
+.checkbox_label{
+    font-size: 14px;
+    user-select: none;
+    color: #4a556d;
+}
 
 #arrow,
 #arrow::before {

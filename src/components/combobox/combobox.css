@@ -1,65 +1,21 @@
 .annotator-combobox {
-    user-select: none;
-    position: relative;
 }
 
-.annotator-combobox__input {
-    width: 300px;
-    height: 40px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-    padding: 6px 10px;
-    font-size: 16px;
-    color: var(--text-1);
-    background-color: #ffffff;
-    transition: border-color 0.15s ease-in-out 0s;
-    outline: none;
-}
+.annotator-combobox__input {}
 
-.annotator-combobox__menu {
-    width: 100%;
-    position: absolute;
-    overflow: scroll;
-    max-height: 180px;
-    background-color: #ffffff;
-    color: var(--text-1);
-    border-radius: 4px;
-    list-style-type: none;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
+.annotator-combobox__menu {}
 
 .annotator-combobox__menu[data-open="true"] {
-    display: block;
+    display: block !important;
     box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,
-        rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
-    padding: 5px 0;
-    z-index: var(--layer0-z);
-}
-
-.annotator-combobox__menu-message {
-    font-size: 11px;
-    padding: 5px;
-    color: #4b4b4b;
-}
-
-.annotator-combobox__menu-messag--disbaled {
-    font-size: 11px;
-    padding: 5px;
-    color: #989898;
+        rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px !important;
+    padding: 5px 0 !important;
+    z-index: var(--layer0-z) !important;
 }
 
 .annotator-combobox__item {
-    padding: 5px;
-    user-select: none;
-    transition: background 20ms ease-in 0s;
-    cursor: pointer;
-    margin-left: 4px;
-    margin-right: 4px;
-    border-radius: 3px;
-    font-size: 16px;
 }
 
 .annotator-combobox__item.highlight {
-    background: rgba(55, 53, 47, 0.08) none repeat scroll 0% 0%;
+    background: rgba(55, 53, 47, 0.08) none repeat scroll 0% 0% !important;
 }
