@@ -1,4 +1,5 @@
-import { useState } from "preact/hooks";
+import { useState, } from "preact/hooks";
+import { render } from 'preact'
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
 import Overlay from "../../lib/overlay";
@@ -6,6 +7,16 @@ import { signal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
+import { createPopper } from "@popperjs/core";
+
+
+// Generate a UUID using the built-in crypto API
+function generateUUID() {
+    let data = crypto.getRandomValues(new Uint8Array(16));
+    data[6] = (data[6] & 0x0f) | 0x40;
+    data[8] = (data[8] & 0x3f) | 0x80;
+    return Array.from(data, byte => ('0' + byte.toString(16)).slice(-2)).join('');
+}
 
 const setSelectedItem = (selectedItem) => {
     console.log(selectedItem);
@@ -99,6 +110,10 @@ const AnnotatorInput = ({ element }) => {
         let input = document.querySelector(".annotator-combobox__input").value;
 
         if (input.trim() === "") {
+            // delete the annotation if there is already annotated
+
+
+
             return;
         }
 
@@ -106,22 +121,46 @@ const AnnotatorInput = ({ element }) => {
             return removeAnnotatorInput();
         }
 
-        let similar_elements = findSimilarElements(element)
+
+        let similar_elements = []
+        if (checked_signal.value) {
+            similar_elements = findSimilarElements(element)
+        }
 
         similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate.title"));
 
+        console.log(similar_elements)
 
         let all_elements = [element, ...similar_elements]
         let xys = [];
 
         all_elements.forEach((ele) => {
+            if (ele.getAttribute("data-annotate-id") === input) {
+                return;
+            };
+
             let x = ele.getBoundingClientRect().x + window.scrollX;
             let y = ele.getBoundingClientRect().y + window.scrollY;
 
             xys.push({ x, y })
 
+            ele.setAttribute("data-annotate-id", generateUUID());
             ele.setAttribute("data-annotate-title", input);
             ele.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
+
+            let div = document.createElement("div");
+            div.className = "annotate-element-title";
+            div.id = ele.getAttribute("data-annotate-id");
+
+
+            let app_container = document.querySelector("#annotator-app-container");
+            app_container.appendChild(div);
+
+            render(<p style={{ all: 'unset', color: 'red', fontSize: "24px", display: "block" }} >{input}</p>, div)
+
+            createPopper(ele, div, {
+                placement: "top-start"
+            });
         })
 
         if (items.some((item) => item.title === input)) {
@@ -214,7 +253,7 @@ const styles = {
         all: "unset",
         paddingTop: "6px",
         paddingBottom: "6px",
-        paddingLeft: "10px",    
+        paddingLeft: "10px",
         paddingRight: "10px",
         fontSize: "14px",
         lineHeight: "20px",
