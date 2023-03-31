@@ -1,4 +1,5 @@
-import { useState } from "preact/hooks";
+import { useState, } from "preact/hooks";
+import { render } from 'preact'
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
 import Overlay from "../../lib/overlay";
@@ -6,6 +7,16 @@ import { signal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
+import { createPopper } from "@popperjs/core";
+
+
+// Generate a UUID using the built-in crypto API
+function generateUUID() {
+    let data = crypto.getRandomValues(new Uint8Array(16));
+    data[6] = (data[6] & 0x0f) | 0x40;
+    data[8] = (data[8] & 0x3f) | 0x80;
+    return Array.from(data, byte => ('0' + byte.toString(16)).slice(-2)).join('');
+}
 
 const setSelectedItem = (selectedItem) => {
     console.log(selectedItem);
@@ -28,14 +39,25 @@ const Checkbox = () => {
     };
 
     return (
-        <div className="checkbox_container">
+        <div className="checkbox_container" style={{
+            display: "flex",
+            alignItems: 'center'
+        }}>
             <button
                 className="checkbox_check"
                 onClick={handleClick}
                 style={
-                    checked_signal.value && {
-                        backgroundColor: "rgb(114, 52, 205)",
-                        borderColor: "rgb(114, 52, 205)",
+                    {
+                        width: "14px",
+                        height: "14px",
+                        borderRadius: "3px",
+                        border: checked_signal.value ? "1px solid #7c4dff" : "1px solid #d1d5db",
+                        backgroundColor: checked_signal.value ? "#7c4dff" : "#fff",
+                        marginRight: "4px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        outline: "none",
                     }
                 }
             >
@@ -57,7 +79,13 @@ const Checkbox = () => {
             </button>
             <label
                 onClick={handleClick}
-                style={{ fontSize: "14px", userSelect: "none" }}
+                style={{
+                    all: 'unset',
+                    fontSize: "14px",
+                    userSelect: "none",
+                    color: "#4a556d",
+                }}
+                className="checkbox_label"
             >
                 Annotate similar elements
             </label>
@@ -80,15 +108,67 @@ const AnnotatorInput = ({ element }) => {
     const handleSubmit = () => {
         // TODO: this is not a good way to get the value, but it works for now
         let input = document.querySelector(".annotator-combobox__input").value;
-        let x = element.getBoundingClientRect().x + window.scrollX;
-        let y = element.getBoundingClientRect().y + window.scrollY;
+
+        if (input.trim() === "") {
+            // delete the annotation if there is already annotated
+
+
+
+            return;
+        }
+
+        if (element.getAttribute("data-annotate-title") === input) {
+            return removeAnnotatorInput();
+        }
+
+
+        let similar_elements = []
+        if (checked_signal.value) {
+            similar_elements = findSimilarElements(element)
+        }
+
+        similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate.title"));
+
+        console.log(similar_elements)
+
+        let all_elements = [element, ...similar_elements]
+        let xys = [];
+
+        all_elements.forEach((ele) => {
+            if (ele.getAttribute("data-annotate-id") === input) {
+                return;
+            };
+
+            let x = ele.getBoundingClientRect().x + window.scrollX;
+            let y = ele.getBoundingClientRect().y + window.scrollY;
+
+            xys.push({ x, y })
+
+            ele.setAttribute("data-annotate-id", generateUUID());
+            ele.setAttribute("data-annotate-title", input);
+            ele.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
+
+            let div = document.createElement("div");
+            div.className = "annotate-element-title";
+            div.id = ele.getAttribute("data-annotate-id");
+
+
+            let app_container = document.querySelector("#annotator-app-container");
+            app_container.appendChild(div);
+
+            render(<p style={{ all: 'unset', color: 'red', fontSize: "24px", display: "block" }} >{input}</p>, div)
+
+            createPopper(ele, div, {
+                placement: "top-start"
+            });
+        })
 
         if (items.some((item) => item.title === input)) {
             let newItems = items.map((item) => {
                 if (item.title === input) {
                     return {
                         ...item,
-                        value: [...item.value, { x, y }]
+                        value: [...item.value, ...xys]
                     }
 
                 } else {
@@ -99,33 +179,22 @@ const AnnotatorInput = ({ element }) => {
         } else {
             setLocalItems([...items, {
                 title: input,
-                value: [{ x, y }]
+                value: [...xys]
             }])
         }
 
-        element.setAttribute("data-annotate-title", input);
-        element.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
+
+        let element_overlay = new Overlay({ disableTip: true });
+        element_overlay.inspect(all_elements, input, true);
 
         removeAnnotatorInput();
-
-        let similar_elements = [];
-
-        if (checked_signal.value) {
-            similar_elements = [...findSimilarElements(element)]
-        }
-
-        console.log("similar_elements", similar_elements)
-
-        let element_overlay = new Overlay(element, input);
-        if (element) {
-            element_overlay.inspect([element, ...similar_elements], input, true);
-        }
     };
 
     return (
         <>
             <div className="annotator_input_container">
                 <Combobox
+                    label="Add Annotation"
                     defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
@@ -140,15 +209,15 @@ const AnnotatorInput = ({ element }) => {
                     <div className="annotator_input_btns">
                         <button
                             onClick={() => removeAnnotatorInput()}
-                            className="annotator_input_btn_danger"
+                            style={styles.btn_secondary}
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleSubmit}
-                            className="annotator_input_btn_primary"
+                            style={styles.btn_primary}
                         >
-                            Submit
+                            Annotate
                         </button>
                     </div>
                 </div>
@@ -160,3 +229,44 @@ const AnnotatorInput = ({ element }) => {
 };
 
 export default AnnotatorInput;
+
+
+/** @type Object.<string, React.CSSProperties> */
+const styles = {
+    btn_primary: {
+        all: "unset",
+        paddingTop: "6px",
+        paddingBottom: "6px",
+        paddingLeft: "10px",
+        paddingRight: "10px",
+        backgroundColor: "#7c4dff",
+        color: "#ffffff",
+        fontSize: "14px",
+        lineHeight: "20px",
+        fontWeight: "600",
+        borderRadius: "6px",
+        outline: "none",
+        border: "none",
+        cursor: "pointer",
+    },
+    btn_secondary: {
+        all: "unset",
+        paddingTop: "6px",
+        paddingBottom: "6px",
+        paddingLeft: "10px",
+        paddingRight: "10px",
+        fontSize: "14px",
+        lineHeight: "20px",
+        fontWeight: "600",
+        borderRadius: "6px",
+        backgroundColor: "#ffffff",
+        color: "#4a556d",
+        marginRight: "8px",
+        cursor: "pointer",
+        border: "none",
+        outline: "none",
+    }
+
+}
+
+

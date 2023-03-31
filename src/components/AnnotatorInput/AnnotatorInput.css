@@ -2,42 +2,8 @@
     background: white;
     box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,
         rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
-    padding: 8px;
-    border-radius: 4px;
-}
-
-.annotator_input_btn_primary {
-    padding-top: 6px;
-    padding-bottom: 6px;
-    padding-left: 10px;
-    padding-right: 10px;
-    background-color: rgb(114, 52, 205);
-    color: #ffffff;
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 600;
-    border-radius: 6px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    outline: none !important;
-    border: none !important;
-    cursor: pointer !important;
-}
-
-.annotator_input_btn_danger {
-    padding-top: 6px;
-    padding-bottom: 6px;
-    padding-left: 10px;
-    padding-right: 10px;
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 600;
-    border-radius: 6px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid #ef4444;
-    background: #fff;
-    color: #ef4444;
-    margin-right: 8px;
-    cursor: pointer;
+    padding: 16px;
+    border-radius: 8px;
 }
 
 .annotator_input_btns_container {
@@ -49,38 +15,15 @@
 .annotator_input_btns {
     display: flex;
     margin-left: auto;
-    margin-top: 8px;
-}
-
-.annotator_checkbox_container {
-    display: flex;
-    align-items: center;
-}
-
-.checkbox_container {
-    display: flex;
-    align-items: center;
-}
-
-.checkbox_check {
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    border: 1px solid #d1d5db;
-    background: #fff;
-    margin-right: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    outline: none !important;
+    margin-top: 24px;
 }
 
 
 #arrow,
 #arrow::before {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 16px;
+  height: 16px;
   background: inherit;
 }
 
@@ -96,19 +39,19 @@
 }
 
 #annotator-input[data-popper-placement^='top'] > #arrow {
-  bottom: -4px;
+  bottom: -8px;
 }
 
 #annotator-input[data-popper-placement^='bottom'] > #arrow {
-  top: -4px;
+  top: -8px;
 }
 
 #annotator-input[data-popper-placement^='left'] > #arrow {
-  right: -4px;
+  right: -8px;
 }
 
 #annotator-input[data-popper-placement^='right'] > #arrow {
-  left: -4px;
+  left: -8px;
 }
 
 
