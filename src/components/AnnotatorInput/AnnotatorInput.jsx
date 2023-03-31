@@ -1,4 +1,4 @@
-import { useState, } from "preact/hooks";
+import { useEffect, useState, } from "preact/hooks";
 import { render } from 'preact'
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
@@ -18,13 +18,9 @@ function generateUUID() {
     return Array.from(data, byte => ('0' + byte.toString(16)).slice(-2)).join('');
 }
 
-const setSelectedItem = (selectedItem) => {
-    console.log(selectedItem);
-};
-
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function({ title, _value }) {
+    return function({ title }) {
         return (
             !inputValue || title.toLowerCase().includes(lowerCasedInputValue)
         );
@@ -95,15 +91,18 @@ const Checkbox = () => {
 
 const AnnotatorInput = ({ element }) => {
     // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
-    /** @type [{title: string, value: {x: string, y: string}[]}[], any]*/
+    /** @type [{title: string, value: {x: string, y: string, id: string}[]}[], any]*/
     const [items, setItems] = useState(
         JSON.parse(localStorage.getItem("items")) || []
     );
+
+    const [canDelete] = useState(() => Boolean(element.getAttribute("data-annotate-id")));
 
     let setLocalItems = (items) => {
         setItems(items);
         localStorage.setItem("items", JSON.stringify(items));
     };
+
 
     const handleSubmit = () => {
         // TODO: this is not a good way to get the value, but it works for now
@@ -111,9 +110,6 @@ const AnnotatorInput = ({ element }) => {
 
         if (input.trim() === "") {
             // delete the annotation if there is already annotated
-
-
-
             return;
         }
 
@@ -127,9 +123,8 @@ const AnnotatorInput = ({ element }) => {
             similar_elements = findSimilarElements(element)
         }
 
-        similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate.title"));
+        similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate-id"));
 
-        console.log(similar_elements)
 
         let all_elements = [element, ...similar_elements]
         let xys = [];
@@ -142,11 +137,13 @@ const AnnotatorInput = ({ element }) => {
             let x = ele.getBoundingClientRect().x + window.scrollX;
             let y = ele.getBoundingClientRect().y + window.scrollY;
 
-            xys.push({ x, y })
-
-            ele.setAttribute("data-annotate-id", generateUUID());
+            let id = generateUUID();
+            ele.setAttribute("data-annotate-id", id);
             ele.setAttribute("data-annotate-title", input);
             ele.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
+
+            xys.push({ x, y, id })
+
 
             let div = document.createElement("div");
             div.className = "annotate-element-title";
@@ -161,6 +158,9 @@ const AnnotatorInput = ({ element }) => {
             createPopper(ele, div, {
                 placement: "top-start"
             });
+
+            let element_overlay = new Overlay({ disableTip: true, id: `data-annotate-id-${id}` })
+            element_overlay.inspect([ele], input, true);
         })
 
         if (items.some((item) => item.title === input)) {
@@ -184,11 +184,97 @@ const AnnotatorInput = ({ element }) => {
         }
 
 
-        let element_overlay = new Overlay({ disableTip: true });
-        element_overlay.inspect(all_elements, input, true);
-
         removeAnnotatorInput();
     };
+
+    const handleEdit = () => {
+        let input = document.querySelector(".annotator-combobox__input").value;
+
+        if (input.trim() === '') {
+            return
+        }
+
+        let id = element.getAttribute("data-annotate-id");
+        let popper = document.getElementById(id);
+        popper.getElementsByTagName("p")[0].innerText = input;
+
+        let newItems = items.map((item) => {
+            if (item.title === element.getAttribute("data-annotate-title")) {
+                return {
+                    ...item,
+                    value: item.value.filter((v) => v.id !== id)
+                }
+
+            } else {
+                return item
+            }
+        })
+
+        element.setAttribute("data-annotate-title", input);
+        let element_xy = JSON.parse(element.getAttribute("data-annotate-value"));
+
+        if (newItems.some((item) => item.title === input)) {
+            let finalItems = newItems.map((item) => {
+                if (item.title === input) {
+                    return {
+                        ...item,
+                        value: [...item.value, {
+                            id,
+                            x: element_xy.x,
+                            y: element_xy.y
+                        }]
+                    }
+
+                } else {
+                    return item
+                }
+            })
+            setLocalItems(finalItems)
+        } else {
+            setLocalItems([...newItems, {
+                title: input,
+                value: [{
+                    id,
+                    x: element_xy.x,
+                    y: element_xy.y
+                }]
+            }])
+        }
+
+
+        removeAnnotatorInput();
+    }
+
+    const handleDelete = () => {
+        // 1. remove attributes from the element
+        // 2. remove the popper
+        // 3. remove the element from the items array
+        // 4. remove the border to the annotated element
+
+        let id = element.getAttribute("data-annotate-id");
+
+        element.removeAttribute("data-annotate-id");
+        element.removeAttribute("data-annotate-title");
+        element.removeAttribute("data-annotate-value");
+
+        let popper = document.getElementById(id);
+        popper.remove();
+
+        let newItems = items.map((item) => {
+            return {
+                ...item,
+                value: item.value.filter((xy) => {
+                    return xy.id !== id
+                })
+            }
+        })
+
+        setLocalItems(newItems)
+
+        document.getElementById(`data-annotate-id-${id}`).remove();
+
+        removeAnnotatorInput()
+    }
 
     return (
         <>
@@ -198,7 +284,7 @@ const AnnotatorInput = ({ element }) => {
                     defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={setSelectedItem}
+                    setSelectedItem={() => {}}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
@@ -206,19 +292,47 @@ const AnnotatorInput = ({ element }) => {
                         <Checkbox />
                     </div>
 
-                    <div className="annotator_input_btns">
-                        <button
-                            onClick={() => removeAnnotatorInput()}
-                            style={styles.btn_secondary}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleSubmit}
-                            style={styles.btn_primary}
-                        >
-                            Annotate
-                        </button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px', alignItems: 'center' }} >
+                        <div>
+                            {canDelete ? (
+                                <button
+                                    onClick={handleDelete}
+                                    className="checkbox_check"
+                                    style={
+                                        {
+                                            all: "unset",
+                                            width: "18px",
+                                            height: "18px",
+                                            borderRadius: "3px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            outline: "none",
+                                            cursor: "pointer"
+                                        }
+                                    }
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="red" >
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                    </svg>
+                                </button>
+                            ) : null}
+                        </div>
+
+                        <div>
+                            <button
+                                onClick={() => removeAnnotatorInput()}
+                                style={styles.btn_secondary}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={element.getAttribute("data-annotate-id") ? handleEdit : handleSubmit}
+                                style={styles.btn_primary}
+                            >
+                                Annotate
+                            </button>
+                        </div>
                     </div>
                 </div>
 

@@ -167,10 +167,10 @@ const Combobox = (props) => {
             <ul
                 {...getMenuProps({})}
                 className="annotator-combobox__menu"
-                style={isOpen && filteredItems.length > 0 ? styles.combobox_menu : { display: 'none' }}
+                style={isOpen && filteredItems.length > 0 ? styles.combobox_menu : { all: 'unset', display: 'none' }}
                 data-open={isOpen}
             >
-                {filteredItems.map((item, index) => (
+                {filteredItems?.length > 0 && filteredItems.map((item, index) => (
                     <li
                         className={`annotator-combobox__item${highlightedIndex === index ? " highlight" : ""
                             }`}

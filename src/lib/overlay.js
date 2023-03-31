@@ -297,7 +297,7 @@ class OverlayTip {
 }
 
 export default class Overlay {
-  constructor({ disableTip } = { disableTip: false }) {
+  constructor({ disableTip, id } = { disableTip: false }) {
     // Find the root window, because overlays are positioned relative to it.
     const currentWindow = window
     this.window = currentWindow
@@ -309,6 +309,7 @@ export default class Overlay {
     const doc = currentWindow.document
     this.container = doc.createElement("div")
     this.container.style.zIndex = "10000000"
+    this.container.id = id
 
     this.disableTip = disableTip || false
 
