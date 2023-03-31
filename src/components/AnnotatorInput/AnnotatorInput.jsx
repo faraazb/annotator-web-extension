@@ -28,14 +28,25 @@ const Checkbox = () => {
     };
 
     return (
-        <div className="checkbox_container">
+        <div className="checkbox_container" style={{
+            display: "flex",
+            alignItems: 'center'
+        }}>
             <button
                 className="checkbox_check"
                 onClick={handleClick}
                 style={
-                    checked_signal.value && {
-                        backgroundColor: "#7c4dff",
-                        borderColor: "#7c4dff",
+                    {
+                        width: "14px",
+                        height: "14px",
+                        borderRadius: "3px",
+                        border: checked_signal.value ? "1px solid #7c4dff" : "1px solid #d1d5db",
+                        backgroundColor: checked_signal.value ? "#7c4dff" : "#fff",
+                        marginRight: "4px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        outline: "none",
                     }
                 }
             >
@@ -57,6 +68,12 @@ const Checkbox = () => {
             </button>
             <label
                 onClick={handleClick}
+                style={{
+                    all: 'unset',
+                    fontSize: "14px",
+                    userSelect: "none",
+                    color: "#4a556d",
+                }}
                 className="checkbox_label"
             >
                 Annotate similar elements
@@ -151,13 +168,13 @@ const AnnotatorInput = ({ element }) => {
                     <div className="annotator_input_btns">
                         <button
                             onClick={() => removeAnnotatorInput()}
-                            className="annotator_input_btn_danger"
+                            style={styles.btn_secondary}
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleSubmit}
-                            className="annotator_input_btn_primary"
+                            style={styles.btn_primary}
                         >
                             Annotate
                         </button>
@@ -171,3 +188,44 @@ const AnnotatorInput = ({ element }) => {
 };
 
 export default AnnotatorInput;
+
+
+/** @type Object.<string, React.CSSProperties> */
+const styles = {
+    btn_primary: {
+        all: "unset",
+        paddingTop: "6px",
+        paddingBottom: "6px",
+        paddingLeft: "10px",
+        paddingRight: "10px",
+        backgroundColor: "#7c4dff",
+        color: "#ffffff",
+        fontSize: "14px",
+        lineHeight: "20px",
+        fontWeight: "600",
+        borderRadius: "6px",
+        outline: "none",
+        border: "none",
+        cursor: "pointer",
+    },
+    btn_secondary: {
+        all: "unset",
+        paddingTop: "6px",
+        paddingBottom: "6px",
+        paddingLeft: "10px",    
+        paddingRight: "10px",
+        fontSize: "14px",
+        lineHeight: "20px",
+        fontWeight: "600",
+        borderRadius: "6px",
+        backgroundColor: "#ffffff",
+        color: "#4a556d",
+        marginRight: "8px",
+        cursor: "pointer",
+        border: "none",
+        outline: "none",
+    }
+
+}
+
+
