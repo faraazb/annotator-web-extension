@@ -94,6 +94,16 @@ export function findSimilarElements(element, levels = 10) {
         return same_structure_elements;
     }
 
+    function ignoreElement(element) {
+        let ignored_tags = ["script", "style", "link", "html", "body", "head"]
+
+        if (ignored_tags.includes(element.tagName.toLowerCase())) {
+            return true
+        }
+
+        return false;
+    }
+
 
     for (let level = 0; level < levels; level++) {
         let temp_next_element = current_element;
@@ -101,13 +111,16 @@ export function findSimilarElements(element, levels = 10) {
 
         while (temp_next_element.nextElementSibling) {
             let next_element = temp_next_element.nextElementSibling;
+
+            if (ignoreElement(next_element)) {
+                temp_next_element = next_element;
+                continue;
+            }
+
             let next_element_structure = generateHTMLStructure(next_element);
             let element_structure = generateHTMLStructure(temp_next_element);
 
             if (isEqual(element_structure, next_element_structure)) {
-                if (next_element.tagName.toLowerCase() === 'script' || next_element.tagName.toLowerCase() === 'style') {
-                    continue;
-                }
                 same_structure_elements.push(next_element);
             }
 
@@ -117,13 +130,16 @@ export function findSimilarElements(element, levels = 10) {
 
         while (temp_prev_element.previousElementSibling) {
             let prev_element = temp_prev_element.previousElementSibling;
+
+            if (ignoreElement(prev_element)) {
+                temp_prev_element = prev_element;
+                continue;
+            }
+
             let prev_element_structure = generateHTMLStructure(prev_element);
             let element_structure = generateHTMLStructure(temp_prev_element);
 
             if (isEqual(element_structure, prev_element_structure)) {
-                if (prev_element.tagName.toLowerCase() === 'script' || prev_element.tagName.toLowerCase() === 'style') {
-                    continue;
-                }
                 same_structure_elements.unshift(prev_element);
             }
 
