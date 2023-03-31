@@ -11,9 +11,9 @@ const styles = {
         backgroundColor: "red",
         width: "300px",
         height: "100%",
-        border: "1px solid #d9d9d9",
-        borderRadius: "4px",
-        padding: "6px 10px",
+        border: "1.5px solid #d9d9d9",
+        borderRadius: "6px",
+        padding: "10px 12px",
         fontSize: "16px",
         color: "var(--text-1)",
         backgroundColor: "#ffffff",
@@ -39,17 +39,22 @@ const styles = {
         listStyleType: "none",
         overflowX: "hidden",
         overflowY: "auto",
-        listStyle: 'none'
+        listStyle: 'none',
     },
     combobox_menu_item: {
-        padding: "5px",
+        padding: "10px 12px",
         userSelect: "none",
         transition: "background 20ms ease-in 0s",
         cursor: "pointer",
-        marginLeft: "4px",
-        marginRight: "4px",
-        borderRadius: "3px",
+        borderRadius: "4px",
         fontSize: "16px",
+    },
+    combobox_label: {
+        fontSize: "14px",
+        color: "rgb(74, 85, 109)",
+        fontWeight: "600",
+        marginBottom: "4px",
+        display: "block",
     }
 }
 
@@ -64,7 +69,9 @@ const Combobox = (props) => {
         getFilter,
         allowCreation = false,
         classNames = {},
-        defaultSelectedItemTitle
+        defaultSelectedItemTitle,
+        label
+
     } = props;
     // TODO unused classnames props, maybe get rid of this
     const { inputClassName } = classNames;
@@ -124,30 +131,37 @@ const Combobox = (props) => {
     return (
         <div className="annotator-combobox" style={styles.annotator_combobox}  >
             <div style={{ position: 'relative', maxHeight: '100%' }} >
-                <input
-                    className={`annotator-combobox__input${inputClassName ? " " + inputClassName : ""}`}
-                    type="text"
-                    placeholder="Add annotation"
-                    {...getInputProps({
-                        style: styles.combobox_input,
-                    })}
-                />
-                <div style={{ position: 'absolute', right: "10px", top: "50%", transform: "translate(0, -50%)" }} >
-                    {inputValue.trim().length > 0 ? (
-                        <button onClick={() => reset()} style={{ background: '#fff', border: 'none', outline: 'none', width: '24px', height: '24px', cursor: 'pointer', color: "#4a556d" }} >
-                            <svg style={{ width: 16, height: 16 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" >
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <label htmlFor="combobox_input" style={styles.combobox_label} >
+                    {label}
+                </label>
+                <div style={{ position: "relative" }} >
+                    <input
+                        className={`annotator-combobox__input${inputClassName ? " " + inputClassName : ""}`}
+                        type="text"
+                        id="combobox_input"
+                        placeholder="Add annotation"
+                        {...getInputProps({
+                            style: styles.combobox_input,
+                        })}
+                    />
+                    <div style={{ position: 'absolute', right: "10px", top: "50%", transform: "translate(0, -50%)", display: 'flex', alignItems: "center", }} >
+                        {inputValue.trim().length > 0 ? (
+                            <button onClick={() => reset()} style={{ background: '#fff', border: 'none', outline: 'none', width: '24px', height: '24px', cursor: 'pointer', color: "#4a556d", display: "flex", alignItems: 'center', justifyContent: "center" }} >
+                                <svg style={{ width: 16, height: 16 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" >
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        ) : (
+                            null
+                        )}
+
+                        <button onClick={() => openMenu()} style={{ background: '#fff', border: 'none', outline: 'none', width: '24px', height: '24px', cursor: "pointer", color: "#4a556d", display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
+                            <svg style={{ width: 16, height: 16 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </button>
-                    ) : (
-                        null
-                    )}
+                    </div>
 
-                    <button onClick={() => openMenu()} style={{ background: '#fff', border: 'none', outline: 'none', width: '24px', height: '24px', cursor: "pointer", color: "#4a556d" }} >
-                        <svg style={{ width: 16, height: 16 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                        </svg>
-                    </button>
                 </div>
             </div>
             <ul

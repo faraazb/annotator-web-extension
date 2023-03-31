@@ -154,6 +154,7 @@ const AnnotatorInput = ({ element }) => {
         <>
             <div className="annotator_input_container">
                 <Combobox
+                    label="Add Annotation"
                     defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
