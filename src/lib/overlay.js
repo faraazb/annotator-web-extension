@@ -167,14 +167,16 @@ class OverlayRect {
 
 
     if (annotated) {
-      let annotated_color = 'rgba(114, 52, 205, 0.5)'
+      let transparent = "transparent"
 
-      this.content.style.backgroundColor = annotated_color
-      this.border.style.borderColor = annotated_color
-      this.padding.style.borderColor = annotated_color
+      this.content.style.backgroundColor = transparent 
+      this.border.style.borderColor = transparent 
+      this.padding.style.borderColor = transparent 
+
+      this.content.style.border = '3px solid ' + "red"
 
       assign(this.node.style, {
-        borderColor: annotated_color,
+        borderColor: transparent,
         pointerEvents: "none",
         position: "absolute",
       })
