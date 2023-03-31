@@ -1,4 +1,4 @@
-import {  useState, } from "preact/hooks";
+import { useEffect, useState, } from "preact/hooks";
 import { render } from 'preact'
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
@@ -18,13 +18,9 @@ function generateUUID() {
     return Array.from(data, byte => ('0' + byte.toString(16)).slice(-2)).join('');
 }
 
-const setSelectedItem = (selectedItem) => {
-    console.log(selectedItem);
-};
-
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function({ title, _value }) {
+    return function({ title }) {
         return (
             !inputValue || title.toLowerCase().includes(lowerCasedInputValue)
         );
@@ -127,9 +123,8 @@ const AnnotatorInput = ({ element }) => {
             similar_elements = findSimilarElements(element)
         }
 
-        similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate.title"));
+        similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate-id"));
 
-        console.log(similar_elements)
 
         let all_elements = [element, ...similar_elements]
         let xys = [];
@@ -192,6 +187,64 @@ const AnnotatorInput = ({ element }) => {
         removeAnnotatorInput();
     };
 
+    const handleEdit = () => {
+        let input = document.querySelector(".annotator-combobox__input").value;
+
+        if (input.trim() === '') {
+            return
+        }
+
+        let id = element.getAttribute("data-annotate-id");
+        let popper = document.getElementById(id);
+        popper.getElementsByTagName("p")[0].innerText = input;
+
+        let newItems = items.map((item) => {
+            if (item.title === element.getAttribute("data-annotate-title")) {
+                return {
+                    ...item,
+                    value: item.value.filter((v) => v.id !== id)
+                }
+
+            } else {
+                return item
+            }
+        })
+
+        element.setAttribute("data-annotate-title", input);
+        let element_xy = JSON.parse(element.getAttribute("data-annotate-value"));
+
+        if (newItems.some((item) => item.title === input)) {
+            let finalItems = newItems.map((item) => {
+                if (item.title === input) {
+                    return {
+                        ...item,
+                        value: [...item.value, {
+                            id,
+                            x: element_xy.x,
+                            y: element_xy.y
+                        }]
+                    }
+
+                } else {
+                    return item
+                }
+            })
+            setLocalItems(finalItems)
+        } else {
+            setLocalItems([...newItems, {
+                title: input,
+                value: [{
+                    id,
+                    x: element_xy.x,
+                    y: element_xy.y
+                }]
+            }])
+        }
+
+
+        removeAnnotatorInput();
+    }
+
     const handleDelete = () => {
         // 1. remove attributes from the element
         // 2. remove the popper
@@ -231,7 +284,7 @@ const AnnotatorInput = ({ element }) => {
                     defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={setSelectedItem}
+                    setSelectedItem={() => {}}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
@@ -274,7 +327,7 @@ const AnnotatorInput = ({ element }) => {
                                 Cancel
                             </button>
                             <button
-                                onClick={handleSubmit}
+                                onClick={element.getAttribute("data-annotate-id") ? handleEdit : handleSubmit}
                                 style={styles.btn_primary}
                             >
                                 Annotate
