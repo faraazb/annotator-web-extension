@@ -107,6 +107,7 @@ const AnnotatorInput = ({ element }) => {
         }
 
         let similar_elements = findSimilarElements(element)
+
         similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate.title"));
 
 

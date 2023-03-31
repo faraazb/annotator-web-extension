@@ -105,6 +105,9 @@ export function findSimilarElements(element, levels = 10) {
             let element_structure = generateHTMLStructure(temp_next_element);
 
             if (isEqual(element_structure, next_element_structure)) {
+                if (next_element.tagName.toLowerCase() === 'script' || next_element.tagName.toLowerCase() === 'style') {
+                    continue;
+                }
                 same_structure_elements.push(next_element);
             }
 
@@ -118,6 +121,9 @@ export function findSimilarElements(element, levels = 10) {
             let element_structure = generateHTMLStructure(temp_prev_element);
 
             if (isEqual(element_structure, prev_element_structure)) {
+                if (prev_element.tagName.toLowerCase() === 'script' || prev_element.tagName.toLowerCase() === 'style') {
+                    continue;
+                }
                 same_structure_elements.unshift(prev_element);
             }
 
