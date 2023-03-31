@@ -27,7 +27,7 @@ const styles = {
         position: "relative"
     },
     combobox_menu: {
-        all:'unset',
+        all: 'unset',
         display: "block",
         width: "100%",
         position: "absolute",
@@ -150,26 +150,24 @@ const Combobox = (props) => {
                     </button>
                 </div>
             </div>
-            {isOpen && filteredItems.length > 0 ? (
-                <ul
-                    {...getMenuProps()}
-                    className="annotator-combobox__menu"
-                    style={isOpen && filteredItems.length > 0 ? styles.combobox_menu : { display: 'none' }}
-                    data-open={isOpen}
-                >
-                    {filteredItems.map((item, index) => (
-                        <li
-                            className={`annotator-combobox__item${highlightedIndex === index ? " highlight" : ""
-                                }`}
-                            {...getItemProps({ item, index })}
-                            key={`${item.value}${item.index}`}
-                            style={styles.combobox_menu_item}
-                        >
-                            {item.title}
-                        </li>
-                    ))}
-                </ul>
-            ) : null}
+            <ul
+                {...getMenuProps({})}
+                className="annotator-combobox__menu"
+                style={isOpen && filteredItems.length > 0 ? styles.combobox_menu : { display: 'none' }}
+                data-open={isOpen}
+            >
+                {filteredItems.map((item, index) => (
+                    <li
+                        className={`annotator-combobox__item${highlightedIndex === index ? " highlight" : ""
+                            }`}
+                        {...getItemProps({ item, index })}
+                        key={`${item.value}${item.index}`}
+                        style={styles.combobox_menu_item}
+                    >
+                        {item.title}
+                    </li>
+                ))}
+            </ul>
 
         </div>
     );
