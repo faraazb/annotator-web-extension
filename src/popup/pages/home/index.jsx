@@ -1,7 +1,7 @@
 import { useEffect } from "preact/hooks";
-import { createLabel, getLeaderboard } from "../../../api";
+import { createUser, getLeaderboard } from "../../../api";
 import { Google, Spline } from "../../../components/icons";
-import { useStore } from "../../../store";
+import {    useStore } from "../../../store";
 import "./home.css";
 
 const Home = () => {
@@ -22,11 +22,17 @@ const Home = () => {
     const loginWithGoogle = async () => {
         const response = await chrome.runtime.sendMessage({ action: "LOGIN" });
         if (response.ok) {
-            setUser(response.data);
+            const { email } = response.data;
+            // create user on server
+            const { ok, data } = await createUser({ email });
+            if (ok || data.msg.includes("already registered")) {
+                setUser(response.data);
+            }
         }
     };
 
     const logoutFromGoogle = async () => {
+        setToolsOpen(false);
         const response = await chrome.runtime.sendMessage({ action: "LOGOUT" });
         if (response.ok) {
             setUser(null);
@@ -35,18 +41,9 @@ const Home = () => {
 
     useEffect(() => {
         (async function () {
-            // TODO extract this as a function and place in api.js
-            // const response = await fetch(
-            //     `https://data-science-theta.vercel.app/api/scoreboard`
-            // );
-            const {ok, data} = await getLeaderboard()
+            const { ok, data } = await getLeaderboard();
             if (ok) {
-                // const responseJson = await response.json();
                 setLeaderboard(data.users);
-            }
-            const {isOk, label} = await createLabel({title: "test label 1"});
-            if (isOk) {
-                console.log(label);
             }
         })();
     }, []);

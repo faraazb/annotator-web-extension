@@ -1,4 +1,6 @@
+import { createAnnotation } from "./api";
 import { getUserInfo, login, logout } from "./oauth";
+import { dataURLtoFile } from "./utils/blob";
 
 // Context Menu
 chrome.runtime.onInstalled.addListener(() => {
@@ -25,11 +27,9 @@ async function loginGoogle() {
         if (result) {
             await chrome.storage.local.set({ user: result });
             return { ok: true, data: result }
-        } else {
-            return { ok: false };
         }
+        return { ok: false }
     } catch (err) {
-        console.log(err)
         return { ok: false, error: err };
     }
 }
@@ -37,13 +37,12 @@ async function loginGoogle() {
 async function logoutGoogle() {
     try {
         const result = await logout();
-        console.log(result)
         if (result) {
             await chrome.storage.local.remove("user");
             return { ok: result }
         }
     } catch (err) {
-        console.log(err)
+        console.error(err)
         return { ok: false, error: err };
     }
 }
@@ -74,6 +73,37 @@ async function captureVisibleTab(options = { format: "png" }) {
 }
 
 
+/**
+ * 
+ * @param {string} screenshot - Data URL
+ * @param {string} name - name to use for the screenshot file
+ * @param {Object[]} annotations
+ * @param {number} annotations[].label
+ * @param {number} annotations[].x
+ * @param {number} annotations[].y
+ * @param {number} annotations[].width
+ * @param {number} annotations[].height
+ */
+async function submitPageAnnotation({ screenshotURL, name, annotations, email }) {
+    // Prepare labels text file with the structure:
+    // label,x,y,width,height\n
+    const labelsData = annotations.map(
+        ({ x, y, width, height, label }) =>
+            [label, x, y, width, height]).join("\n");
+    const labelsBlob = new Blob([labelsData], { type: "text/plain" });
+    const labelsFile = new File([labelsBlob], "labels.txt", {
+        type: "text/plain",
+    });
+
+    const response = await createAnnotation({
+        screenshot: dataURLtoFile(screenshotURL, name),
+        annotations: labelsFile,
+        email,
+    });
+    return response;
+}
+
+
 // Messaging
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     const { action, payload } = message;
@@ -92,5 +122,6 @@ const handlers = {
     "LOGOUT": logoutGoogle,
     "CREATE_TAB": createTab,
     "QUERY_TABS": queryTabs,
-    "CAPTURE_TAB": captureVisibleTab
+    "CAPTURE_TAB": captureVisibleTab,
+    "CREATE_ANNOTATION": submitPageAnnotation
 }
