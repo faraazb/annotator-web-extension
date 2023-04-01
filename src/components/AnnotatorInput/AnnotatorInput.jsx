@@ -105,7 +105,6 @@ const AnnotatorInput = ({ element }) => {
 
 
     const handleSubmit = () => {
-        // TODO: this is not a good way to get the value, but it works for now
         let input = document.querySelector(".annotator-combobox__input").value;
 
         if (input.trim() === "") {
@@ -144,16 +143,27 @@ const AnnotatorInput = ({ element }) => {
 
             xys.push({ x, y, id })
 
+            let element_styels = window.getComputedStyle(ele);
 
             let div = document.createElement("div");
             div.className = "annotate-element-title";
             div.id = ele.getAttribute("data-annotate-id");
-
+            div.style.width = element_styels.width;
 
             let app_container = document.querySelector("#annotator-app-container");
             app_container.appendChild(div);
 
-            render(<p style={{ all: 'unset', color: 'red', fontSize: "24px", display: "block" }} >{input}</p>, div)
+            render(
+                <p
+                    style={{
+                        all: 'unset',
+                        color: 'red',
+                        fontSize: "24px",
+                        display: "block",
+                        // transform: `translate(${xTransform}px, calc(${yTransform}px - 50%))`
+                    }} >
+                    {input}
+                </p>, div)
 
             createPopper(ele, div, {
                 placement: "top-start"
@@ -284,7 +294,7 @@ const AnnotatorInput = ({ element }) => {
                     defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => {}}
+                    setSelectedItem={() => { }}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
