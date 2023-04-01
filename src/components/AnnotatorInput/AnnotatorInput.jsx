@@ -153,6 +153,9 @@ const AnnotatorInput = ({ element }) => {
             let app_container = document.querySelector("#annotator-app-container");
             app_container.appendChild(div);
 
+            let paddingTop = parseInt(window.getComputedStyle(ele).paddingTop, 10) || 0;
+            let paddingLeft = parseInt(window.getComputedStyle(ele).paddingLeft, 10) || 0;
+
             render(
                 <p
                     style={{
@@ -160,13 +163,29 @@ const AnnotatorInput = ({ element }) => {
                         color: 'red',
                         fontSize: "24px",
                         display: "block",
-                        // transform: `translate(${xTransform}px, calc(${yTransform}px - 50%))`
+                        marginLeft: paddingLeft + "px",
                     }} >
                     {input}
-                </p>, div)
+                </p>,
+                div
+            )
 
             createPopper(ele, div, {
-                placement: "top-start"
+                placement: "top",
+                modifiers: [
+                    {
+                        name: "offset",
+                        options: {
+                            offset: ({ placement }) => {
+                                if (placement === 'top') {
+                                    return [0, -paddingTop]
+                                }
+
+                                return [0, 0]
+                            },
+                        },
+                    }
+                ]
             });
 
             let element_overlay = new Overlay({ disableTip: true, id: `data-annotate-id-${id}` })
