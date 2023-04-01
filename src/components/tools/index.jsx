@@ -97,10 +97,14 @@ const Tools = () => {
                 shouldUpload,
             });
         }
+        // this creates problem
         // startInspectorMode();
     };
 
     useEffect(() => {
+        if (screenshot) {
+            startInspectorMode();
+        }
         (async function () {
             if (screenshot && upload) {
                 const labels = [
