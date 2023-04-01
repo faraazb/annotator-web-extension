@@ -4,7 +4,7 @@ const config = {
     "logoutUrl": "https://accounts.google.com/logout",
     "tokenInfoUrl": "https://www.googleapis.com/oauth2/v3/tokeninfo",
     "clientId": "408016905439-t2ooip6mmu6f7p18301nor6r8hgp8p6b.apps.googleusercontent.com",
-    "scopes": "https://www.googleapis.com/auth/userinfo.profile"
+    "scopes": "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
 };
 
 let token = null;
@@ -20,24 +20,23 @@ async function getUserInfo(token) {
     }
 }
 
-function login() {
-    return new Promise((resolve, reject) => {
-        let authUrl = config.implicitGrantUrl
-            + '?response_type=token&client_id=' + config.clientId
-            + '&scope=' + config.scopes
-            + '&redirect_uri=' + chrome.identity.getRedirectURL("oauth2")
-            + '&prompt=select_account';
+async function login() {
+    let authUrl = config.implicitGrantUrl
+        + '?response_type=token&client_id=' + config.clientId
+        + '&scope=' + config.scopes
+        + '&redirect_uri=' + chrome.identity.getRedirectURL("oauth2")
+        + '&prompt=select_account';
 
-        chrome.identity.launchWebAuthFlow({ 'url': authUrl, 'interactive': true }, function (redirectUrl) {
-            if (redirectUrl) {
-                let parsed = parse(redirectUrl.substr(chrome.identity.getRedirectURL("oauth2").length + 1));
-                token = parsed.access_token;
-                resolve(token);
-            } else {
-                reject(undefined);
-            }
-        });
-    })
+    try {
+        const redirectUrl = await chrome.identity.launchWebAuthFlow({ 'url': authUrl, 'interactive': true });
+        if (redirectUrl) {
+            let parsed = parse(redirectUrl.substr(chrome.identity.getRedirectURL("oauth2").length + 1));
+            return parsed.access_token
+        }
+    } catch (error) {
+        console.error(error)
+        return;
+    }
 }
 
 async function logout() {

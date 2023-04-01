@@ -5,7 +5,7 @@ class API {
     }
 
     async request(endpoint, options) {
-        let opts = { ...this.options, ...options};
+        let opts = { ...this.options, ...options };
         // jsonify body when required
         if ("body" in opts && opts.headers["Content-type"] === "application/json") {
             opts.body = JSON.stringify(opts.body);
@@ -13,9 +13,13 @@ class API {
         const req = new Request(this.baseUrl + endpoint, opts);
         try {
             const res = await fetch(req);
+            const data = await res.json();
             if (res.ok) {
-                return { ok: true, data: await res.json() };
+                return { ok: true, data };
             }
+            // TODO once the server starts returning a consistent error field
+            // retutn them from here
+            return { ok: false, data };
         }
         catch (error) {
             return { ok: false, error };
@@ -31,30 +35,68 @@ class API {
     }
 }
 
-const api = new API({ 
+const api = new API({
     baseUrl: "https://data-science-theta.vercel.app/api",
-    options: { 
-        headers: { 
+    // baseUrl: "http://localhost:3000/api",
+    options: {
+        headers: {
             "Content-type": "application/json"
-        } 
-    } 
+        }
+    }
 });
 
 const routes = {
+    createUser: "/create-user",
     leaderboard: "/scoreboard",
-    labels: "/labels"
+    labels: "/labels",
+    submit: "/submit"
 }
 
 
 const getLeaderboard = async () => {
-    return await api.get(routes.leaderboard)
+    return await api.get(routes.leaderboard);
+}
+
+const getLabels = async () => {
+    return await api.get(routes.labels);
 }
 
 const createLabel = async ({ title }) => {
     return await api.post(routes.labels, { body: { title } });
 }
 
+const createUser = async ({ email }) => {
+    return await api.post(routes.createUser, { body: { email } });
+}
+
+/**
+ * 
+ * @param {File} screenshot
+ * @param {File} annotations
+ * @param {string} email
+ */
+const createAnnotation = async ({ screenshot, annotations, email }) => {
+
+    const formData = new FormData();
+    formData.append("label", annotations);
+    formData.append("image", screenshot);
+
+    // console.log(Array.from(formData.entries()))
+    // console.log(user.email)
+
+    // header object is overwritten, no application/json for this one
+    return await api.post(routes.submit, {
+        mode: "cors",
+        headers: { "email": email },
+        redirect: "follow",
+        body: formData
+    });
+}
+
 export {
+    createUser,
     getLeaderboard,
+    getLabels,
     createLabel,
+    createAnnotation
 }
