@@ -1,7 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { createUser, getLeaderboard } from "../../../api";
 import { Google, Spline } from "../../../components/icons";
-import {    useStore } from "../../../store";
+import { useStore } from "../../../store";
 import "./home.css";
 
 const Home = () => {
@@ -116,43 +116,46 @@ const Home = () => {
                             </thead>
                             <tbody className="leaderboard__body">
                                 {leaderboard &&
-                                    leaderboard.map(
-                                        (
-                                            { email: name, count: points },
-                                            index
-                                        ) => {
-                                            const rank = index + 1;
-                                            return (
-                                                <tr
-                                                    className="leader"
-                                                    key={`${rank}-${name}`}
-                                                >
-                                                    <td
-                                                        className={`leader__rank${
-                                                            rank < 4
-                                                                ? " top"
-                                                                : ""
-                                                        }`}
-                                                        data-rank={rank}
-                                                        // show title tooltip when rank is larger than max col width
-                                                        title={
-                                                            rank > 9999
-                                                                ? rank
-                                                                : null
-                                                        }
+                                    // show only top 20
+                                    leaderboard
+                                        .slice(0, 20)
+                                        .map(
+                                            (
+                                                { email: name, count: points },
+                                                index
+                                            ) => {
+                                                const rank = index + 1;
+                                                return (
+                                                    <tr
+                                                        className="leader"
+                                                        key={`${rank}-${name}`}
                                                     >
-                                                        <div>{rank}</div>
-                                                    </td>
-                                                    <td className="leader__username">
-                                                        {name}
-                                                    </td>
-                                                    <td className="leader__points">
-                                                        {points}
-                                                    </td>
-                                                </tr>
-                                            );
-                                        }
-                                    )}
+                                                        <td
+                                                            className={`leader__rank${
+                                                                rank < 4
+                                                                    ? " top"
+                                                                    : ""
+                                                            }`}
+                                                            data-rank={rank}
+                                                            // show title tooltip when rank will not fit in col
+                                                            title={
+                                                                rank > 9999
+                                                                    ? rank
+                                                                    : null
+                                                            }
+                                                        >
+                                                            <div>{rank}</div>
+                                                        </td>
+                                                        <td className="leader__username">
+                                                            {name}
+                                                        </td>
+                                                        <td className="leader__points">
+                                                            {points}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            }
+                                        )}
                             </tbody>
                             {/* <tfoot className="leaderboard__foot">
                                 <tr>
