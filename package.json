@@ -19,6 +19,7 @@
     "preact": "^10.13.1",
     "preact-router": "^4.1.0",
     "react-draggable": "^4.4.5",
+    "react-hot-toast": "^2.4.0",
     "react-popper": "^2.3.0",
     "teaful": "^0.11.1"
   },
