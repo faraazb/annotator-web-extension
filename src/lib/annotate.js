@@ -84,12 +84,25 @@ const handleElementClick = (e) => {
     let app_container = document.getElementById("annotator-app-container");
     app_container.appendChild(annotatorInput);
 
+    let paddingTop = parseInt(window.getComputedStyle(target).paddingTop, 10);
+    let paddingBottom = parseInt(window.getComputedStyle(target).paddingBottom, 10);
+
     createPopper(target, annotatorInput, {
         modifiers: [
             {
                 name: "offset",
                 options: {
-                    offset: [0, 16],
+                    offset: ({ placement }) => {
+                        if (placement === "top") {
+                            return [0, -paddingTop + 16]
+                        }
+                        if(placement === "bottom") {
+                            return [0, -paddingBottom + 16]
+                        }
+                        else {
+                            return [0, 0];
+                        }
+                    },
                 }
             }
         ]

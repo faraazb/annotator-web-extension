@@ -27,6 +27,19 @@ function getLabelsFilter(inputValue) {
     };
 }
 
+function detectCollision(element1, element2) {
+    const { top: top1, right: right1, bottom: bottom1, left: left1 } = element1.getBoundingClientRect();
+    const { top: top2, right: right2, bottom: bottom2, left: left2 } = element2.getBoundingClientRect();
+
+    return !(
+        right1 < left2 ||
+        left1 > right2 ||
+        bottom1 < top2 ||
+        top1 > bottom2
+    );
+}
+
+
 const checked_signal = signal(false);
 
 const Checkbox = () => {
@@ -153,6 +166,9 @@ const AnnotatorInput = ({ element }) => {
             let app_container = document.querySelector("#annotator-app-container");
             app_container.appendChild(div);
 
+            let paddingTop = parseInt(window.getComputedStyle(ele).paddingTop, 10) || 0;
+            let paddingLeft = parseInt(window.getComputedStyle(ele).paddingLeft, 10) || 0;
+
             render(
                 <p
                     style={{
@@ -160,17 +176,66 @@ const AnnotatorInput = ({ element }) => {
                         color: 'red',
                         fontSize: "24px",
                         display: "block",
-                        // transform: `translate(${xTransform}px, calc(${yTransform}px - 50%))`
+                        marginLeft: paddingLeft + "px",
                     }} >
                     {input}
-                </p>, div)
+                </p>,
+                div
+            )
 
-            createPopper(ele, div, {
-                placement: "top-start"
+            let popper_instance = createPopper(ele, div, {
+                placement: "top",
+                modifiers: [
+                    {
+                        name: "offset",
+                        options: {
+                            offset: ({ placement }) => {
+                                if (placement === 'top') {
+                                    return [0, -paddingTop]
+                                }
+
+                                return [0, 0]
+                            },
+                        },
+                    },
+                    {
+                        name: "flip",
+                        options: {
+                            flipVariations: false,
+                        }
+                    }
+                ]
             });
 
-            let element_overlay = new Overlay({ disableTip: true, id: `data-annotate-id-${id}` })
-            element_overlay.inspect([ele], input, true);
+            popper_instance.update().then((ads) => {
+                let rects = ads.elements.popper.getBoundingClientRect();
+                let eles_from_point = document.elementsFromPoint(rects.x, rects.y);
+
+                let my_element = eles_from_point.find((e) => {
+                    if (e.getAttribute("class") === "annotate-element-title") {
+                        return e
+                    }
+                })
+
+                if (my_element) {
+                    let to_compare = document.getElementsByClassName("annotate-element-title");
+                    to_compare = Array.from(to_compare).filter((e) => e.id !== my_element.id);
+                    to_compare.forEach((e) => {
+                        let collides = detectCollision(e, my_element)
+                        if (collides) {
+                            // popper_instance.setOptions({
+                            //     placement: 'bottom',
+                            // }).then(() => {
+                            //     popper_instance.forceUpdate()
+                            // })
+                        }
+                    })
+                }
+
+                let element_overlay = new Overlay({ disableTip: true, id: `data-annotate-id-${id}` })
+                element_overlay.inspect([ele], input, true);
+            })
+
         })
 
         if (items.some((item) => item.title === input)) {
