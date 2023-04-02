@@ -195,6 +195,8 @@ const AnnotatorInput = ({ element }) => {
                         fontSize: "24px",
                         display: "block",
                         marginLeft: paddingLeft + "px",
+                        "-webkit-text-stroke": "1px #fff",
+                        fontWeight: "bold"
                     }}
                 >
                     {input}
@@ -251,11 +253,11 @@ const AnnotatorInput = ({ element }) => {
                     to_compare.forEach((e) => {
                         let collides = detectCollision(e, my_element);
                         if (collides) {
-                            // popper_instance.setOptions({
-                            //     placement: 'bottom',
-                            // }).then(() => {
-                            //     popper_instance.forceUpdate()
-                            // })
+                            popper_instance.setOptions({
+                                placement: 'bottom-end',
+                            }).then(() => {
+                                popper_instance.forceUpdate()
+                            })
                         }
                     });
                 }
