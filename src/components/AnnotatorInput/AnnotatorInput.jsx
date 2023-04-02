@@ -69,6 +69,7 @@ const Checkbox = () => {
                 className="checkbox_check"
                 onClick={handleClick}
                 style={{
+                    all: 'unset',
                     width: "14px",
                     height: "14px",
                     borderRadius: "3px",
@@ -81,6 +82,7 @@ const Checkbox = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     outline: "none",
+                    cursor: "pointer"
                 }}
             >
                 {checked_signal.value ? (
