@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { useCombobox } from "downshift";
 import "./combobox.css";
 
@@ -15,12 +15,17 @@ const styles = {
         borderRadius: "6px",
         padding: "10px 12px",
         fontSize: "16px",
-        color: "var(--text-1)",
+        color: "black",
         backgroundColor: "#ffffff",
         transition: "border-color 0.15s ease-in-out 0s",
         outline: "none",
         fontWeight: "normal",
         position: "relative",
+    },
+    combobox_input_open: {
+        display: "block",
+        boxShadow: "rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px!important",
+        zIndex: '999999'
     },
     annotator_combobox: {
         userSelect: 'none',
@@ -48,6 +53,7 @@ const styles = {
         cursor: "pointer",
         borderRadius: "4px",
         fontSize: "16px",
+        color: "black"
     },
     combobox_label: {
         fontSize: "14px",
@@ -127,6 +133,14 @@ const Combobox = (props) => {
         return true;
     };
 
+    let inputRef = useRef(null)
+    let inputProps = getInputProps({
+        style: {
+            ...styles.combobox_input,
+            ...(isOpen ? styles.combobox_input_open : {})
+        },
+        ref: inputRef
+    })
 
     return (
         <div className="annotator-combobox" style={styles.annotator_combobox}  >
@@ -140,9 +154,7 @@ const Combobox = (props) => {
                         type="text"
                         id="combobox_input"
                         placeholder="Add annotation"
-                        {...getInputProps({
-                            style: styles.combobox_input,
-                        })}
+                        {...inputProps}
                     />
                     <div style={{ position: 'absolute', right: "10px", top: "50%", transform: "translate(0, -50%)", display: 'flex', alignItems: "center", }} >
                         {inputValue.trim().length > 0 ? (

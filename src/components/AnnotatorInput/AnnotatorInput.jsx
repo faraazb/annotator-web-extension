@@ -207,34 +207,34 @@ const AnnotatorInput = ({ element }) => {
                 ]
             });
 
-            // popper_instance.update().then((ads) => {
-            //     let rects = ads.elements.popper.getBoundingClientRect();
-            //     let eles_from_point = document.elementsFromPoint(rects.x, rects.y);
-            //
-            //     let my_element = eles_from_point.find((e) => {
-            //         if (e.getAttribute("class") === "annotate-element-title") {
-            //             return e
-            //         }
-            //     })
-            //
-            //     if (my_element) {
-            //         let to_compare = document.getElementsByClassName("annotate-element-title");
-            //         to_compare = Array.from(to_compare).filter((e) => e.id !== my_element.id);
-            //         to_compare.forEach((e) => {
-            //             let collides = detectCollision(e, my_element)
-            //             if (collides) {
-            //                 popper_instance.setOptions({
-            //                     placement: 'bottom',
-            //                 }).then(() => {
-            //                     popper_instance.forceUpdate()
-            //                 })
-            //             }
-            //         })
-            //     }
-            //
-            //     let element_overlay = new Overlay({ disableTip: true, id: `data-annotate-id-${id}` })
-            //     element_overlay.inspect([ele], input, true);
-            // })
+            popper_instance.update().then((ads) => {
+                let rects = ads.elements.popper.getBoundingClientRect();
+                let eles_from_point = document.elementsFromPoint(rects.x, rects.y);
+
+                let my_element = eles_from_point.find((e) => {
+                    if (e.getAttribute("class") === "annotate-element-title") {
+                        return e
+                    }
+                })
+
+                if (my_element) {
+                    let to_compare = document.getElementsByClassName("annotate-element-title");
+                    to_compare = Array.from(to_compare).filter((e) => e.id !== my_element.id);
+                    to_compare.forEach((e) => {
+                        let collides = detectCollision(e, my_element)
+                        if (collides) {
+                            // popper_instance.setOptions({
+                            //     placement: 'bottom',
+                            // }).then(() => {
+                            //     popper_instance.forceUpdate()
+                            // })
+                        }
+                    })
+                }
+
+                let element_overlay = new Overlay({ disableTip: true, id: `data-annotate-id-${id}` })
+                element_overlay.inspect([ele], input, true);
+            })
 
         })
 
