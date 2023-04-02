@@ -104,6 +104,12 @@ const handleElementClick = (e) => {
                         }
                     },
                 }
+            },
+            {
+                name: "flip",
+                options: {
+                    fallbackPlacements: ["left", "right"],
+                }
             }
         ]
     });

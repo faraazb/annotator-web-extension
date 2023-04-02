@@ -1,26 +1,8 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 :root {
     --accent-primary: #7234cd;
     --layer0-z: 999999; /* App container - labels, etc.*/
     --layer1-z: 9999999; /* Tools container */
     --layer2-z: 10000001; /* Popup container */
-}
-
-.icon {
-    display: block;
-    height: auto;
-    width: 100%;
-    fill: #fff;
-}
-
-.stroked-icon {
-    stroke: #fff;
-    fill: none;
 }
 
 #annotator-app-container {
