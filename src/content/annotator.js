@@ -6,7 +6,7 @@ console.log("content script loaded");
 // inject the app
 async function startAnnotator() {
     initApp();
-    startInspectorMode()
+    startInspectorMode();
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
