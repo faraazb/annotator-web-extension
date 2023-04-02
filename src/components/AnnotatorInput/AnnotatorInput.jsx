@@ -201,10 +201,12 @@ const AnnotatorInput = ({ element }) => {
                     {
                         name: "flip",
                         options: {
-                            flipVariations: false,
+                            // this will disable flip
+                            fallbackPlacements: [],
                         }
                     }
-                ]
+                ],
+                strategy: "absolute"
             });
 
             popper_instance.update().then((ads) => {
