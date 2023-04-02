@@ -1,7 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import Draggable from "react-draggable";
 import { usePopper } from "react-popper";
-import { createAnnotation } from "../../api";
 import useScreenshot from "../../hooks/use-screenshot";
 import { exitInspectorMode, startInspectorMode } from "../../lib/annotate";
 import { useStore } from "../../store";
@@ -10,12 +9,10 @@ import {
     Camera,
     Download,
     DragHandle,
-    Save,
-    Screenshot,
     SendPlane,
     Spline,
 } from "../icons";
-import "./tools.css";
+// import "./tools.css";
 
 const Tools = () => {
     const [user, setUser] = useStore.user();

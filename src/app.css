@@ -1,0 +1,22 @@
+/* This stylesheet is dynamically injected as a style tag
+ *  inside a shadow tree
+*/
+@import "./components/tools/tools.css";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.icon {
+    display: block;
+    height: auto;
+    width: 100%;
+    fill: #fff;
+}
+
+.stroked-icon {
+    stroke: #fff;
+    fill: none;
+}
