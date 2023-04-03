@@ -8,6 +8,7 @@ import { signal } from "@preact/signals";
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
 import { computeStyles, createPopper } from "@popperjs/core";
+import { createLabel, getLabels } from "../../api";
 
 // Generate a UUID using the built-in crypto API
 function generateUUID() {
@@ -123,12 +124,21 @@ const AnnotatorInput = ({ element }) => {
     const [items, setItems] = useState(
         JSON.parse(localStorage.getItem("items")) || []
     );
+    const [loading, setLoading] = useState(false);
 
 
 
     const [canDelete] = useState(() =>
         Boolean(element.getAttribute("data-annotate-id"))
     );
+
+    useEffect(() => {
+        (async () => {
+            let res = await getLabels()
+            console.log("res from getLabels ", res)
+        })()
+    }, [])
+
 
     let setLocalItems = (items) => {
         setItems(items);
@@ -305,6 +315,7 @@ const AnnotatorInput = ({ element }) => {
             });
             setLocalItems(newItems);
         } else {
+
             setLocalItems([
                 ...items,
                 {
@@ -312,12 +323,20 @@ const AnnotatorInput = ({ element }) => {
                     value: [...xys],
                 },
             ]);
+
+            createLabel({
+                title: input,
+            }).then(() => {
+            }).catch((err) => {
+                console.log(err)
+            })
         }
 
         removeAnnotatorInput();
     };
 
-    const handleEdit = () => {
+    const handleEdit = async () => {
+        setLoading(true)
         let input = document.querySelector(".annotator-combobox__input").value;
 
         if (input.trim() === "") {
@@ -377,7 +396,11 @@ const AnnotatorInput = ({ element }) => {
                     ],
                 },
             ]);
+
+
         }
+
+        setLoading(false)
 
         removeAnnotatorInput();
     };
@@ -486,14 +509,19 @@ const AnnotatorInput = ({ element }) => {
                                         ? handleEdit
                                         : handleSubmit
                                 }
-                                style={styles.btn_primary}
+                                style={
+                                    {
+                                        ...styles.btn_primary,
+                                        backgroundColor: loading ? 'rgba(49%, 30%, 100%, 0.5)' : "#7c4dff",
+                                    }
+                                }
                             >
                                 Annotate
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
             <div id="arrow" data-popper-arrow></div>
         </>
     );
