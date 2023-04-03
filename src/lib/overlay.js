@@ -160,10 +160,10 @@ class OverlayRect {
     this.content = doc.createElement("div")
 
 
-    // this.node.id = 'node'
-    // this.border.id = 'border'
-    // this.padding.id = 'padding'
-    // this.content.id = 'content'
+    this.node.classList.add("node")
+    this.border.classList.add("border")
+    this.padding.classList.add("padding")
+    this.content.classList.add("content")
 
 
     if (annotated) {

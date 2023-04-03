@@ -10,45 +10,69 @@ import { findSimilarElements } from "../../lib/similar";
 import { computeStyles, createPopper } from "@popperjs/core";
 import { createLabel, getLabels } from "../../api";
 
+function is_element_or_its_parents_fixed_or_sticky(node) {
+    while (node && node.nodeName.toLowerCase() !== "body") {
+        let position = window.getComputedStyle(node).getPropertyValue("position").toLowerCase();
+        if (position === "fixed" || position === "sticky") {
+            return node;
+        }
+        node = node.parentNode;
+    }
+    return null
+}
+
+function check(el1, el2) {
+    console.log("a");
+    let rect1 = el1.getBoundingClientRect();
+    let rect2 = el2.getBoundingClientRect();
+
+    if (el1.contains(el2)) {
+        if (
+            rect1.left <= rect2.left &&
+            rect1.right >= rect2.right &&
+            rect1.top <= rect2.top &&
+            rect1.bottom >= rect2.bottom
+        ) {
+            return "Element 2 is inside Element 1 and colliding";
+        } else {
+            return "Element 2 is inside Element 1";
+        }
+    } else if (el2.contains(el1)) {
+        if (
+            rect2.left <= rect1.left &&
+            rect2.right >= rect1.right &&
+            rect2.top <= rect1.top &&
+            rect2.bottom >= rect1.bottom
+        ) {
+            return "Element 1 is inside Element 2 and colliding";
+        } else {
+            return "Element 1 is inside Element 2";
+        }
+    } else {
+        return "Elements are not inside each other";
+    }
+}
+
 // Generate a UUID using the built-in crypto API
 function generateUUID() {
     let data = crypto.getRandomValues(new Uint8Array(16));
     data[6] = (data[6] & 0x0f) | 0x40;
     data[8] = (data[8] & 0x3f) | 0x80;
-    return Array.from(data, (byte) => ("0" + byte.toString(16)).slice(-2)).join(
-        ""
-    );
+    return Array.from(data, (byte) => ("0" + byte.toString(16)).slice(-2)).join("");
 }
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function({ title }) {
-        return (
-            !inputValue || title.toLowerCase().includes(lowerCasedInputValue)
-        );
+    return function ({ title }) {
+        return !inputValue || title.toLowerCase().includes(lowerCasedInputValue);
     };
 }
 
 function detectCollision(element1, element2) {
-    const {
-        top: top1,
-        right: right1,
-        bottom: bottom1,
-        left: left1,
-    } = element1.getBoundingClientRect();
-    const {
-        top: top2,
-        right: right2,
-        bottom: bottom2,
-        left: left2,
-    } = element2.getBoundingClientRect();
+    const { top: top1, right: right1, bottom: bottom1, left: left1 } = element1.getBoundingClientRect();
+    const { top: top2, right: right2, bottom: bottom2, left: left2 } = element2.getBoundingClientRect();
 
-    return !(
-        right1 < left2 ||
-        left1 > right2 ||
-        bottom1 < top2 ||
-        top1 > bottom2
-    );
+    return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
 }
 
 const checked_signal = signal(false);
@@ -74,9 +98,7 @@ const Checkbox = () => {
                     width: "14px",
                     height: "14px",
                     borderRadius: "3px",
-                    border: checked_signal.value
-                        ? "1px solid #7c4dff"
-                        : "1px solid #d1d5db",
+                    border: checked_signal.value ? "1px solid #7c4dff" : "1px solid #d1d5db",
                     backgroundColor: checked_signal.value ? "#7c4dff" : "#fff",
                     marginRight: "4px",
                     display: "flex",
@@ -94,11 +116,7 @@ const Checkbox = () => {
                         stroke-width="2"
                         stroke="#fff"
                     >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M4.5 12.75l6 6 9-13.5"
-                        />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
                 ) : null}
             </button>
@@ -121,14 +139,10 @@ const Checkbox = () => {
 const AnnotatorInput = ({ element }) => {
     // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
     /** @type [{title: string, value: {x: string, y: string, id: string}[]}[], any]*/
-    const [items, setItems] = useState(
-        JSON.parse(localStorage.getItem("items")) || []
-    );
+    const [items, setItems] = useState(JSON.parse(localStorage.getItem("items")) || []);
     const [loading, setLoading] = useState(false);
 
-    const [canDelete] = useState(() =>
-        Boolean(element.getAttribute("data-annotate-id"))
-    );
+    const [canDelete] = useState(() => Boolean(element.getAttribute("data-annotate-id")));
 
     useEffect(() => {
         (async () => {
@@ -159,9 +173,7 @@ const AnnotatorInput = ({ element }) => {
             similar_elements = findSimilarElements(element);
         }
 
-        similar_elements = similar_elements.filter(
-            (e) => !e.getAttribute("data-annotate-id")
-        );
+        similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate-id"));
 
         let all_elements = [element, ...similar_elements];
         let xys = [];
@@ -194,17 +206,12 @@ const AnnotatorInput = ({ element }) => {
             div.id = ele.getAttribute("data-annotate-id");
             div.style.width = element_styels.width;
 
-            let app_container = document.querySelector(
-                "#annotator-app-container"
-            );
+            let app_container = document.querySelector("#annotator-app-container");
             app_container.appendChild(div);
 
-            let paddingTop =
-                parseInt(window.getComputedStyle(ele).paddingTop, 10) || 0;
-            let paddingLeft =
-                parseInt(window.getComputedStyle(ele).paddingLeft, 10) || 0;
-            let paddingBottom =
-                parseInt(window.getComputedStyle(ele).paddingBottom, 10) || 0;
+            let paddingTop = parseInt(window.getComputedStyle(ele).paddingTop, 10) || 0;
+            let paddingLeft = parseInt(window.getComputedStyle(ele).paddingLeft, 10) || 0;
+            let paddingBottom = parseInt(window.getComputedStyle(ele).paddingBottom, 10) || 0;
 
             render(
                 <p className="stroke-single" title={input}>
@@ -223,10 +230,6 @@ const AnnotatorInput = ({ element }) => {
                                 if (placement === "top") {
                                     return [paddingLeft, -paddingTop];
                                 }
-                                //
-                                // if (placement === "bottom") {
-                                //     return [0, -paddingBottom];
-                                // }
 
                                 return [0, 0];
                             },
@@ -243,61 +246,81 @@ const AnnotatorInput = ({ element }) => {
                 strategy: "absolute",
             });
 
-            popper_instance.update().then((ads) => {
-                let rects = ads.elements.popper.getBoundingClientRect();
-                let eles_from_point = document.elementsFromPoint(
-                    rects.x,
-                    rects.y
-                );
 
-                let my_element = eles_from_point.find((e) => {
-                    if (e.getAttribute("class") === "annotate-element-title") {
-                        return e;
-                    }
-                });
-
-                if (my_element) {
-                    let to_compare = document.getElementsByClassName(
-                        "annotate-element-title"
-                    );
-                    to_compare = Array.from(to_compare).filter(
-                        (e) => e.id !== my_element.id
-                    );
-                    to_compare.forEach((e) => {
-                        let collides = detectCollision(e, my_element);
-                        if (collides) {
-                            popper_instance
-                                .setOptions({
-                                    placement: "bottom",
-                                })
-                                .then(() => {
-                                    popper_instance.forceUpdate();
-                                });
-                        }
-                    });
-                }
-
-                let element_overlay = new Overlay({
-                    disableTip: true,
-                    id: `data-annotate-id-${id}`,
-                });
-
-                let isElementIselftFixedOrSticky =
-                    window.getComputedStyle(ele).position === "fixed" ||
-                    window.getComputedStyle(ele).position === "sticky";
-
-                const fixedOrAbsoluteAncestor = Boolean(
-                    ele.closest(
-                        '[style*="position: fixed"], [style*="position: sticky"]'
-                    )
-                );
-
-                if (isElementIselftFixedOrSticky || fixedOrAbsoluteAncestor) {
-                    element_overlay.inspect([ele], input, true, "fixed");
-                } else {
-                    element_overlay.inspect([ele], input, true);
-                }
+            let element_overlay = new Overlay({
+                disableTip: true,
+                id: `data-annotate-id-${id}`,
             });
+
+            if (is_element_or_its_parents_fixed_or_sticky(ele)) {
+                console.log("in the if");
+                element_overlay.inspect([ele], input, true, "fixed");
+            } else {
+                console.log(" in the else");
+                element_overlay.inspect([ele], input, true);
+            }
+
+            // let outer_element = document.querySelector(`#data-annotate-id-${id}`).querySelector(".content");
+            // let inner_element = div;
+            //
+            // let res = check(outer_element, inner_element);
+            // console.log(res);
+
+            // popper_instance.update().then((ads) => {
+            //     let rects = ads.elements.popper.getBoundingClientRect();
+            //     let eles_from_point = document.elementsFromPoint(
+            //         rects.x,
+            //         rects.y
+            //     );
+            //
+            //     let my_element = eles_from_point.find((e) => {
+            //         if (e.getAttribute("class") === "annotate-element-title") {
+            //             return e;
+            //         }
+            //     });
+            //
+            //     if (my_element) {
+            //         let to_compare = document.getElementsByClassName(
+            //             "annotate-element-title"
+            //         );
+            //         to_compare = Array.from(to_compare).filter(
+            //             (e) => e.id !== my_element.id
+            //         );
+            //         to_compare.forEach((e) => {
+            //             let collides = detectCollision(e, my_element);
+            //             if (collides) {
+            //                 popper_instance
+            //                     .setOptions({
+            //                         placement: "bottom",
+            //                     })
+            //                     .then(() => {
+            //                         popper_instance.forceUpdate();
+            //                     });
+            //             }
+            //         });
+            //     }
+            //
+            //     let element_overlay = new Overlay({
+            //         disableTip: true,
+            //         id: `data-annotate-id-${id}`,
+            //     });
+            //
+            //     let isElementIselftFixedOrSticky =
+            //         window.getComputedStyle(ele).position === "fixed" ||
+            //         window.getComputedStyle(ele).position === "sticky";
+            //
+            //     const fixedOrAbsoluteAncestor = Boolean(
+            //         ele.closest(
+            //             '[style*="position: fixed"], [style*="position: sticky"]'
+            //         )
+            //     );
+            //
+            //     if (isElementIselftFixedOrSticky || fixedOrAbsoluteAncestor) {
+            //         element_overlay.inspect([ele], input, true, "fixed");
+            //     } else {
+            //         element_overlay.inspect([ele], input, true);
+            //     }
+            // });
         });
 
         if (items.some((item) => item.title === input)) {
@@ -324,7 +347,7 @@ const AnnotatorInput = ({ element }) => {
             createLabel({
                 title: input,
             })
-                .then(() => { })
+                .then(() => {})
                 .catch((err) => {
                     console.log(err);
                 });
@@ -358,9 +381,7 @@ const AnnotatorInput = ({ element }) => {
         });
 
         element.setAttribute("data-annotate-title", input);
-        let element_xy = JSON.parse(
-            element.getAttribute("data-annotate-value")
-        );
+        let element_xy = JSON.parse(element.getAttribute("data-annotate-value"));
 
         if (newItems.some((item) => item.title === input)) {
             let finalItems = newItems.map((item) => {
@@ -438,12 +459,10 @@ const AnnotatorInput = ({ element }) => {
             <div className="annotator_input_container">
                 <Combobox
                     label="Add Annotation"
-                    defaultSelectedItemTitle={
-                        element.getAttribute("data-annotate-title") || null
-                    }
+                    defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => { }}
+                    setSelectedItem={() => {}}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
@@ -494,23 +513,14 @@ const AnnotatorInput = ({ element }) => {
                         </div>
 
                         <div>
-                            <button
-                                onClick={() => removeAnnotatorInput()}
-                                style={styles.btn_secondary}
-                            >
+                            <button onClick={() => removeAnnotatorInput()} style={styles.btn_secondary}>
                                 Cancel
                             </button>
                             <button
-                                onClick={
-                                    element.getAttribute("data-annotate-id")
-                                        ? handleEdit
-                                        : handleSubmit
-                                }
+                                onClick={element.getAttribute("data-annotate-id") ? handleEdit : handleSubmit}
                                 style={{
                                     ...styles.btn_primary,
-                                    backgroundColor: loading
-                                        ? "rgba(49%, 30%, 100%, 0.5)"
-                                        : "#7c4dff",
+                                    backgroundColor: loading ? "rgba(49%, 30%, 100%, 0.5)" : "#7c4dff",
                                 }}
                             >
                                 Annotate
