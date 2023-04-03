@@ -40,7 +40,7 @@ const Tools = () => {
     });
 
     useEffect(() => {
-        (async function () {
+        (async function() {
             // just for extra precaution as once the popup loads, user is
             // going to be present in the teaful store
             if (!user) {
@@ -97,26 +97,16 @@ const Tools = () => {
         if (screenshot) {
             startInspectorMode();
         }
-        (async function () {
+        (async function() {
             if (screenshot && upload) {
                 const toastId = toast.loading("Sending to server...");
-                // TODO:Raj change this from localstorage
-                const labels = [
-                    {
-                        title: "Hello",
-                        x: 4,
-                        y: 7,
-                        width: 20,
-                        height: 10,
-                    },
-                    {
-                        title: "Hello World",
-                        x: 4,
-                        y: 7,
-                        width: 20,
-                        height: 10,
-                    },
-                ];
+                let items = JSON.parse(localStorage.getItem('items'))
+
+                let labels = items.map((item) => {
+                    return item.value.map(({ id, ...rest }) => ({ title: item.title, ...rest }))
+                }).reduce((prev, curr) => [...prev, ...curr], []);
+
+
                 // TODO IMPORTANT screenshot is an array of blobs, since screenshot can be split
                 // in multiple files
                 const result = await chrome.runtime.sendMessage({
@@ -147,7 +137,7 @@ const Tools = () => {
             id: 4,
             Icon: <Camera />,
             styles: { cursor: "default" },
-            onClick: () => {},
+            onClick: () => { },
             ref: setReferenceElement,
             onMouseOver: () => setScreenshotMenuOpen(true),
             onMouseLeave: () => setScreenshotMenuOpen(false),
@@ -194,12 +184,11 @@ const Tools = () => {
                                             // onMouseLeave={onMouseLeave}
                                             tabIndex={-1}
                                             key={`annotator-tool-${id}`}
-                                            className={`tool-button${
-                                                id === selectedTool
-                                                    ? " " +
-                                                      "tool-button--selected"
-                                                    : ""
-                                            }`}
+                                            className={`tool-button${id === selectedTool
+                                                ? " " +
+                                                "tool-button--selected"
+                                                : ""
+                                                }`}
                                             onClick={
                                                 onClick ||
                                                 (() => {
