@@ -1,21 +1,13 @@
 import { useEffect, useState } from "preact/hooks";
 import Draggable from "react-draggable";
 import { usePopper } from "react-popper";
-import { createAnnotation } from "../../api";
+import toast from "react-hot-toast";
 import useScreenshot from "../../hooks/use-screenshot";
 import { exitInspectorMode, startInspectorMode } from "../../lib/annotate";
 import { useStore } from "../../store";
 import { blobToDataURL } from "../../utils/blob";
-import {
-    Camera,
-    Download,
-    DragHandle,
-    Save,
-    Screenshot,
-    SendPlane,
-    Spline,
-} from "../icons";
-import "./tools.css";
+import { Camera, Download, DragHandle, SendPlane, Spline } from "../icons";
+// import "./tools.css";
 
 const Tools = () => {
     const [user, setUser] = useStore.user();
@@ -107,6 +99,7 @@ const Tools = () => {
         }
         (async function () {
             if (screenshot && upload) {
+                const toastId = toast.loading("Sending to server...");
                 // TODO:Raj change this from localstorage
                 const labels = [
                     {
@@ -135,10 +128,15 @@ const Tools = () => {
                         email: user.email,
                     },
                 });
-                // TODO show a toast notification? when successful
-                // if (result.ok) {
-
-                // }
+                if (result.ok) {
+                    toast.success("Submitted successfully!", {
+                        id: toastId,
+                    });
+                } else {
+                    toast.error("Failed to send to server", {
+                        id: toastId,
+                    });
+                }
             }
         })();
     }, [screenshot]);
