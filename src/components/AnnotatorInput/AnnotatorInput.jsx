@@ -350,6 +350,7 @@ const AnnotatorInput = ({ element }) => {
         let id = element.getAttribute("data-annotate-id");
         let popper = document.getElementById(id);
         popper.getElementsByTagName("p")[0].innerText = input;
+        popper.getElementsByTagName("p")[0].title = input;
 
         let newItems = items.map((item) => {
             if (item.title === element.getAttribute("data-annotate-title")) {
