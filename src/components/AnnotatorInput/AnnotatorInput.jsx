@@ -21,7 +21,7 @@ function generateUUID() {
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function ({ title }) {
+    return function({ title }) {
         return (
             !inputValue || title.toLowerCase().includes(lowerCasedInputValue)
         );
@@ -69,6 +69,7 @@ const Checkbox = () => {
                 className="checkbox_check"
                 onClick={handleClick}
                 style={{
+                    all: 'unset',
                     width: "14px",
                     height: "14px",
                     borderRadius: "3px",
@@ -81,6 +82,7 @@ const Checkbox = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     outline: "none",
+                    cursor: "pointer"
                 }}
             >
                 {checked_signal.value ? (
@@ -168,7 +170,7 @@ const AnnotatorInput = ({ element }) => {
             ele.setAttribute("data-annotate-title", input);
             ele.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
 
-            xys.push({ x, y, id });
+            xys.push({ x, y, id, width: ele.getBoundingClientRect().width, height: ele.getBoundingClientRect().height });
 
             let element_styels = window.getComputedStyle(ele);
 
@@ -186,6 +188,8 @@ const AnnotatorInput = ({ element }) => {
                 parseInt(window.getComputedStyle(ele).paddingTop, 10) || 0;
             let paddingLeft =
                 parseInt(window.getComputedStyle(ele).paddingLeft, 10) || 0;
+            let paddingBottom =
+                parseInt(window.getComputedStyle(ele).paddingBottom, 10) || 0;
 
             render(
                 <p
@@ -213,6 +217,10 @@ const AnnotatorInput = ({ element }) => {
                             offset: ({ placement }) => {
                                 if (placement === "top") {
                                     return [0, -paddingTop];
+                                }
+
+                                if (placement === "bottom") {
+                                    return [0, -paddingBottom];
                                 }
 
                                 return [0, 0];
@@ -254,7 +262,7 @@ const AnnotatorInput = ({ element }) => {
                         let collides = detectCollision(e, my_element);
                         if (collides) {
                             popper_instance.setOptions({
-                                placement: 'bottom-end',
+                                placement: 'bottom',
                             }).then(() => {
                                 popper_instance.forceUpdate()
                             })
@@ -401,7 +409,7 @@ const AnnotatorInput = ({ element }) => {
                     }
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => {}}
+                    setSelectedItem={() => { }}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
