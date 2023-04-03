@@ -107,6 +107,7 @@ const Tools = () => {
         }
         (async function () {
             if (screenshot && upload) {
+                // TODO:Raj change this from localstorage
                 const labels = [
                     {
                         title: "Hello",
