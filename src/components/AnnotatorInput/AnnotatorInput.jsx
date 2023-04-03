@@ -7,7 +7,7 @@ import { signal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
-import { computeStyles, createPopper } from "@popperjs/core";
+import { computeStyles, createPopper, Placement } from "@popperjs/core";
 import { createLabel, getLabels } from "../../api";
 
 function is_element_or_its_parents_fixed_or_sticky(node) {
@@ -18,7 +18,7 @@ function is_element_or_its_parents_fixed_or_sticky(node) {
         }
         node = node.parentNode;
     }
-    return null
+    return null;
 }
 
 function check(el1, el2) {
@@ -63,12 +63,14 @@ function generateUUID() {
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function ({ title }) {
+    return function({ title }) {
         return !inputValue || title.toLowerCase().includes(lowerCasedInputValue);
     };
 }
 
 function detectCollision(element1, element2) {
+    console.log(element1.getBoundingClientRect());
+    console.log(element2.getBoundingClientRect());
     const { top: top1, right: right1, bottom: bottom1, left: left1 } = element1.getBoundingClientRect();
     const { top: top2, right: right2, bottom: bottom2, left: left2 } = element2.getBoundingClientRect();
 
@@ -147,7 +149,6 @@ const AnnotatorInput = ({ element }) => {
     useEffect(() => {
         (async () => {
             let res = await getLabels();
-            console.log("res from getLabels ", res);
         })();
     }, []);
 
@@ -156,7 +157,7 @@ const AnnotatorInput = ({ element }) => {
         localStorage.setItem("items", JSON.stringify(items));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         let input = document.querySelector(".annotator-combobox__input").value;
 
         if (input.trim() === "") {
@@ -178,7 +179,7 @@ const AnnotatorInput = ({ element }) => {
         let all_elements = [element, ...similar_elements];
         let xys = [];
 
-        all_elements.forEach((ele) => {
+        all_elements.forEach(async (ele) => {
             if (ele.getAttribute("data-annotate-id") === input) {
                 return;
             }
@@ -227,7 +228,7 @@ const AnnotatorInput = ({ element }) => {
                         name: "offset",
                         options: {
                             offset: ({ placement }) => {
-                                if (placement === "top") {
+                                if (placement === "top-start") {
                                     return [paddingLeft, -paddingTop];
                                 }
 
@@ -246,81 +247,46 @@ const AnnotatorInput = ({ element }) => {
                 strategy: "absolute",
             });
 
-
             let element_overlay = new Overlay({
                 disableTip: true,
                 id: `data-annotate-id-${id}`,
             });
 
             if (is_element_or_its_parents_fixed_or_sticky(ele)) {
-                console.log("in the if");
-                element_overlay.inspect([ele], input, true, 'fixed');
+                element_overlay.inspect([ele], input, true, "fixed");
             } else {
-                console.log(" in the else");
                 element_overlay.inspect([ele], input, true);
             }
 
-            // let outer_element = document.querySelector(`#data-annotate-id-${id}`).querySelector(".content");
-            // let inner_element = div;
-            //
-            // let res = check(outer_element, inner_element);
-            // console.log(res);
+            const all_annotated_elements = document.querySelectorAll("[data-annotate-id]");
 
-            // popper_instance.update().then((ads) => {
-            //     let rects = ads.elements.popper.getBoundingClientRect();
-            //     let eles_from_point = document.elementsFromPoint(
-            //         rects.x,
-            //         rects.y
-            //     );
-            //
-            //     let my_element = eles_from_point.find((e) => {
-            //         if (e.getAttribute("class") === "annotate-element-title") {
-            //             return e;
-            //         }
-            //     });
-            //
-            //     if (my_element) {
-            //         let to_compare = document.getElementsByClassName(
-            //             "annotate-element-title"
-            //         );
-            //         to_compare = Array.from(to_compare).filter(
-            //             (e) => e.id !== my_element.id
-            //         );
-            //         to_compare.forEach((e) => {
-            //             let collides = detectCollision(e, my_element);
-            //             if (collides) {
-            //                 popper_instance
-            //                     .setOptions({
-            //                         placement: "bottom",
-            //                     })
-            //                     .then(() => {
-            //                         popper_instance.forceUpdate();
-            //                     });
-            //             }
-            //         });
-            //     }
-            //
-            //     let element_overlay = new Overlay({
-            //         disableTip: true,
-            //         id: `data-annotate-id-${id}`,
-            //     });
-            //
-            //     let isElementIselftFixedOrSticky =
-            //         window.getComputedStyle(ele).position === "fixed" ||
-            //         window.getComputedStyle(ele).position === "sticky";
-            //
-            //     const fixedOrAbsoluteAncestor = Boolean(
-            //         ele.closest(
-            //             '[style*="position: fixed"], [style*="position: sticky"]'
-            //         )
-            //     );
-            //
-            //     if (isElementIselftFixedOrSticky || fixedOrAbsoluteAncestor) {
-            //         element_overlay.inspect([ele], input, true, "fixed");
-            //     } else {
-            //         element_overlay.inspect([ele], input, true);
-            //     }
-            // });
+            // If thou dare remove yonder line of code, be prepared to face the wrath of the debugging gods
+            // and suffer the consequences of thy foolish actions.
+            popper_instance.forceUpdate();
+
+            /** @type {Placement[]} */
+            let placement_sequence = ["right", "bottom", "left", "top"];
+
+            for (let item of all_annotated_elements) {
+                if (item.getAttribute("data-annotate-id") !== id) {
+                    let collided = detectCollision(item, div);
+                    let placement = popper_instance.state.placement;
+
+                    if (collided) {
+                        while (collided || placement === "top") {
+                            let current_placement_index = placement_sequence.indexOf(placement);
+                            let next_placement =
+                                placement_sequence[(current_placement_index + 1) % placement_sequence.length];
+                            placement = next_placement;
+                            await popper_instance.setOptions({
+                                placement: next_placement,
+                            });
+                            await popper_instance.update();
+                            collided = detectCollision(item, div);
+                        }
+                    }
+                }
+            }
         });
 
         if (items.some((item) => item.title === input)) {
@@ -347,7 +313,7 @@ const AnnotatorInput = ({ element }) => {
             createLabel({
                 title: input,
             })
-                .then(() => {})
+                .then(() => { })
                 .catch((err) => {
                     console.log(err);
                 });
@@ -462,7 +428,7 @@ const AnnotatorInput = ({ element }) => {
                     defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => {}}
+                    setSelectedItem={() => { }}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
