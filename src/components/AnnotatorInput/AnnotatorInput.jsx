@@ -22,7 +22,7 @@ function generateUUID() {
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function({ title }) {
+    return function ({ title }) {
         return (
             !inputValue || title.toLowerCase().includes(lowerCasedInputValue)
         );
@@ -70,7 +70,7 @@ const Checkbox = () => {
                 className="checkbox_check"
                 onClick={handleClick}
                 style={{
-                    all: 'unset',
+                    all: "unset",
                     width: "14px",
                     height: "14px",
                     borderRadius: "3px",
@@ -83,7 +83,7 @@ const Checkbox = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     outline: "none",
-                    cursor: "pointer"
+                    cursor: "pointer",
                 }}
             >
                 {checked_signal.value ? (
@@ -126,19 +126,16 @@ const AnnotatorInput = ({ element }) => {
     );
     const [loading, setLoading] = useState(false);
 
-
-
     const [canDelete] = useState(() =>
         Boolean(element.getAttribute("data-annotate-id"))
     );
 
     useEffect(() => {
         (async () => {
-            let res = await getLabels()
-            console.log("res from getLabels ", res)
-        })()
-    }, [])
-
+            let res = await getLabels();
+            console.log("res from getLabels ", res);
+        })();
+    }, []);
 
     let setLocalItems = (items) => {
         setItems(items);
@@ -182,7 +179,13 @@ const AnnotatorInput = ({ element }) => {
             ele.setAttribute("data-annotate-title", input);
             ele.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
 
-            xys.push({ x, y, id, width: ele.getBoundingClientRect().width, height: ele.getBoundingClientRect().height });
+            xys.push({
+                x,
+                y,
+                id,
+                width: ele.getBoundingClientRect().width,
+                height: ele.getBoundingClientRect().height,
+            });
 
             let element_styels = window.getComputedStyle(ele);
 
@@ -205,15 +208,10 @@ const AnnotatorInput = ({ element }) => {
 
             render(
                 <p
+                    className="stroke-single"
+                    title={input}
                     style={{
-                        all: "unset",
-                        color: "red",
-                        fontSize: "24px",
-                        display: "block",
                         marginLeft: paddingLeft + "px",
-                        // "-webkit-text-stroke": "1px #fff",
-                        // fontWeight: "bold"
-                        fontWeight: 500
                     }}
                 >
                     {input}
@@ -274,11 +272,13 @@ const AnnotatorInput = ({ element }) => {
                     to_compare.forEach((e) => {
                         let collides = detectCollision(e, my_element);
                         if (collides) {
-                            popper_instance.setOptions({
-                                placement: 'bottom',
-                            }).then(() => {
-                                popper_instance.forceUpdate()
-                            })
+                            popper_instance
+                                .setOptions({
+                                    placement: "bottom",
+                                })
+                                .then(() => {
+                                    popper_instance.forceUpdate();
+                                });
                         }
                     });
                 }
@@ -289,13 +289,17 @@ const AnnotatorInput = ({ element }) => {
                 });
 
                 let isElementIselftFixedOrSticky =
-                    window.getComputedStyle(ele).position === 'fixed' || window.getComputedStyle(ele).position === 'sticky';
+                    window.getComputedStyle(ele).position === "fixed" ||
+                    window.getComputedStyle(ele).position === "sticky";
 
-                const fixedOrAbsoluteAncestor =
-                    Boolean(ele.closest('[style*="position: fixed"], [style*="position: sticky"]'));
+                const fixedOrAbsoluteAncestor = Boolean(
+                    ele.closest(
+                        '[style*="position: fixed"], [style*="position: sticky"]'
+                    )
+                );
 
                 if (isElementIselftFixedOrSticky || fixedOrAbsoluteAncestor) {
-                    element_overlay.inspect([ele], input, true, 'fixed');
+                    element_overlay.inspect([ele], input, true, "fixed");
                 } else {
                     element_overlay.inspect([ele], input, true);
                 }
@@ -315,7 +319,6 @@ const AnnotatorInput = ({ element }) => {
             });
             setLocalItems(newItems);
         } else {
-
             setLocalItems([
                 ...items,
                 {
@@ -326,17 +329,18 @@ const AnnotatorInput = ({ element }) => {
 
             createLabel({
                 title: input,
-            }).then(() => {
-            }).catch((err) => {
-                console.log(err)
             })
+                .then(() => {})
+                .catch((err) => {
+                    console.log(err);
+                });
         }
 
         removeAnnotatorInput();
     };
 
     const handleEdit = async () => {
-        setLoading(true)
+        setLoading(true);
         let input = document.querySelector(".annotator-combobox__input").value;
 
         if (input.trim() === "") {
@@ -396,11 +400,9 @@ const AnnotatorInput = ({ element }) => {
                     ],
                 },
             ]);
-
-
         }
 
-        setLoading(false)
+        setLoading(false);
 
         removeAnnotatorInput();
     };
@@ -446,7 +448,7 @@ const AnnotatorInput = ({ element }) => {
                     }
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => { }}
+                    setSelectedItem={() => {}}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
@@ -509,19 +511,19 @@ const AnnotatorInput = ({ element }) => {
                                         ? handleEdit
                                         : handleSubmit
                                 }
-                                style={
-                                    {
-                                        ...styles.btn_primary,
-                                        backgroundColor: loading ? 'rgba(49%, 30%, 100%, 0.5)' : "#7c4dff",
-                                    }
-                                }
+                                style={{
+                                    ...styles.btn_primary,
+                                    backgroundColor: loading
+                                        ? "rgba(49%, 30%, 100%, 0.5)"
+                                        : "#7c4dff",
+                                }}
                             >
                                 Annotate
                             </button>
                         </div>
                     </div>
                 </div>
-            </div >
+            </div>
             <div id="arrow" data-popper-arrow></div>
         </>
     );
