@@ -254,7 +254,7 @@ const AnnotatorInput = ({ element }) => {
 
             if (is_element_or_its_parents_fixed_or_sticky(ele)) {
                 console.log("in the if");
-                element_overlay.inspect([ele], input, true, "fixed");
+                element_overlay.inspect([ele], input, true, 'fixed');
             } else {
                 console.log(" in the else");
                 element_overlay.inspect([ele], input, true);
