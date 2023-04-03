@@ -22,7 +22,7 @@ function generateUUID() {
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function ({ title }) {
+    return function({ title }) {
         return (
             !inputValue || title.toLowerCase().includes(lowerCasedInputValue)
         );
@@ -207,13 +207,7 @@ const AnnotatorInput = ({ element }) => {
                 parseInt(window.getComputedStyle(ele).paddingBottom, 10) || 0;
 
             render(
-                <p
-                    className="stroke-single"
-                    title={input}
-                    style={{
-                        marginLeft: paddingLeft + "px",
-                    }}
-                >
+                <p className="stroke-single" title={input}>
                     {input}
                 </p>,
                 div
@@ -227,12 +221,12 @@ const AnnotatorInput = ({ element }) => {
                         options: {
                             offset: ({ placement }) => {
                                 if (placement === "top") {
-                                    return [0, -paddingTop];
+                                    return [paddingLeft, -paddingTop];
                                 }
-
-                                if (placement === "bottom") {
-                                    return [0, -paddingBottom];
-                                }
+                                //
+                                // if (placement === "bottom") {
+                                //     return [0, -paddingBottom];
+                                // }
 
                                 return [0, 0];
                             },
@@ -330,7 +324,7 @@ const AnnotatorInput = ({ element }) => {
             createLabel({
                 title: input,
             })
-                .then(() => {})
+                .then(() => { })
                 .catch((err) => {
                     console.log(err);
                 });
@@ -449,7 +443,7 @@ const AnnotatorInput = ({ element }) => {
                     }
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => {}}
+                    setSelectedItem={() => { }}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
