@@ -55,6 +55,10 @@ const handleElementPointerOver = (e) => {
     const target = e.target;
     if (!target || !overlay) return;
 
+    // if (!(target instanceof HTMLElement)) {
+    //     return false;
+    // }
+
     if (canIgnore(target)) {
         return;
     }
@@ -64,8 +68,23 @@ const handleElementPointerOver = (e) => {
 
 const handleElementClick = (e) => {
     e.preventDefault();
-
     const target = e.target;
+    // even the tools menu gets ignored through here
+    if (target.shadowRoot) {
+        return;
+    }
+    renderLabel(target);
+}
+
+const handleShadowElementClick = (target) => {
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+    renderLabel(target);
+}
+
+const renderLabel = (target) => {
+
     if (!target) return;
 
     if (canIgnore(target)) {
@@ -96,7 +115,7 @@ const handleElementClick = (e) => {
                         if (placement === "top") {
                             return [0, -paddingTop + 16]
                         }
-                        if(placement === "bottom") {
+                        if (placement === "bottom") {
                             return [0, -paddingBottom + 16]
                         }
                         else {
@@ -145,9 +164,16 @@ window.addEventListener("mousemove", (e) => {
     mousePos.y = e.clientY;
 });
 
-window.addEventListener("beforeunload", function() {
+window.addEventListener("beforeunload", function () {
     this.localStorage.removeItem("annotating");
 });
-window.addEventListener("beforeunload", function() {
+window.addEventListener("beforeunload", function () {
     this.localStorage.removeItem("annotating");
 });
+
+export {
+    handleElementPointerOver,
+    handleElementClick,
+    handleShadowElementClick,
+    renderLabel,
+}

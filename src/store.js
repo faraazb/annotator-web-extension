@@ -1,5 +1,10 @@
 import createStore from "teaful";
 
+export const tools = {
+    SELECT: 1,
+    RECTANGLE: 2,
+    ELEMENT_PICKER: 3
+};
 
 // although the same store can be used in bg and content
 // remember that they are seperate instances and are not shared
@@ -7,6 +12,7 @@ import createStore from "teaful";
 
 const initialStore = {
     user: null,
+    selectedTool: tools.ELEMENT_PICKER,
     toolsOpen: true,
     leaderboard: [],
     annotations: [],

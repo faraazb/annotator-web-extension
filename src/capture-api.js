@@ -398,6 +398,20 @@ const CaptureAPI = (function () {
     }
 
     function preScreenshotCleanup() {
+        const styles = `
+            .annotator-fix--sticky {
+                position: relative !important;
+                inset: auto !important;
+            }
+            
+            .annotator-fix--fixed {
+                position: absolute !important;
+            }`;
+        const style = document.createElement("style");
+        style.id = "annotator-fixes"
+        style.innerHTML = styles;
+        document.body.appendChild(style);
+
         const elements = document.querySelectorAll("*");
 
         elements.forEach((element) => {
@@ -415,6 +429,8 @@ const CaptureAPI = (function () {
     }
 
     function postScreenshotCleanup() {
+        const style = document.getElementById("annotator-fixes");
+        style.remove();
         const elements = document.querySelectorAll(".annotator-screenshot-fix");
         elements.forEach((element) => {
             element.classList.remove("annotator-screenshot-fix", "annotator-fix--sticky", "annotator-fix--fixed");

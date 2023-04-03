@@ -6,12 +6,19 @@ import useScreenshot from "../../hooks/use-screenshot";
 import { exitInspectorMode, startInspectorMode } from "../../lib/annotate";
 import { useStore } from "../../store";
 import { blobToDataURL } from "../../utils/blob";
-import { Camera, Download, DragHandle, SendPlane, Spline } from "../icons";
+import {
+    Camera,
+    Download,
+    DragHandle,
+    RectangleTool,
+    SendPlane,
+    Spline,
+} from "../icons";
 // import "./tools.css";
 
 const Tools = () => {
     const [user, setUser] = useStore.user();
-    const [selectedTool, setSelectedTool] = useState(3);
+    const [selectedTool, setSelectedTool] = useStore.selectedTool();
     const [open, setOpen] = useStore.toolsOpen();
     const [screenshotMenuOpen, setScreenshotMenuOpen] = useState(false);
     const [
@@ -40,7 +47,7 @@ const Tools = () => {
     });
 
     useEffect(() => {
-        (async function() {
+        (async function () {
             // just for extra precaution as once the popup loads, user is
             // going to be present in the teaful store
             if (!user) {
@@ -97,15 +104,19 @@ const Tools = () => {
         if (screenshot) {
             startInspectorMode();
         }
-        (async function() {
+        (async function () {
             if (screenshot && upload) {
                 const toastId = toast.loading("Sending to server...");
-                let items = JSON.parse(localStorage.getItem('items'))
+                let items = JSON.parse(localStorage.getItem("items"));
 
-                let labels = items.map((item) => {
-                    return item.value.map(({ id, ...rest }) => ({ title: item.title, ...rest }))
-                }).reduce((prev, curr) => [...prev, ...curr], []);
-
+                let labels = items
+                    .map((item) => {
+                        return item.value.map(({ id, ...rest }) => ({
+                            title: item.title,
+                            ...rest,
+                        }));
+                    })
+                    .reduce((prev, curr) => [...prev, ...curr], []);
 
                 // TODO IMPORTANT screenshot is an array of blobs, since screenshot can be split
                 // in multiple files
@@ -132,12 +143,13 @@ const Tools = () => {
     }, [screenshot]);
 
     const tools = [
+        { id: 2, Icon: <RectangleTool /> },
         { id: 3, Icon: <Spline /> },
         {
             id: 4,
             Icon: <Camera />,
             styles: { cursor: "default" },
-            onClick: () => { },
+            onClick: () => {},
             ref: setReferenceElement,
             onMouseOver: () => setScreenshotMenuOpen(true),
             onMouseLeave: () => setScreenshotMenuOpen(false),
@@ -184,11 +196,12 @@ const Tools = () => {
                                             // onMouseLeave={onMouseLeave}
                                             tabIndex={-1}
                                             key={`annotator-tool-${id}`}
-                                            className={`tool-button${id === selectedTool
-                                                ? " " +
-                                                "tool-button--selected"
-                                                : ""
-                                                }`}
+                                            className={`tool-button${
+                                                id === selectedTool
+                                                    ? " " +
+                                                      "tool-button--selected"
+                                                    : ""
+                                            }`}
                                             onClick={
                                                 onClick ||
                                                 (() => {
