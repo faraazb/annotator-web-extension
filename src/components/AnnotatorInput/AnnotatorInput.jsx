@@ -7,7 +7,7 @@ import { signal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
-import { createPopper } from "@popperjs/core";
+import { computeStyles, createPopper } from "@popperjs/core";
 
 // Generate a UUID using the built-in crypto API
 function generateUUID() {
@@ -124,6 +124,8 @@ const AnnotatorInput = ({ element }) => {
         JSON.parse(localStorage.getItem("items")) || []
     );
 
+
+
     const [canDelete] = useState(() =>
         Boolean(element.getAttribute("data-annotate-id"))
     );
@@ -199,8 +201,9 @@ const AnnotatorInput = ({ element }) => {
                         fontSize: "24px",
                         display: "block",
                         marginLeft: paddingLeft + "px",
-                        "-webkit-text-stroke": "1px #fff",
-                        fontWeight: "bold"
+                        // "-webkit-text-stroke": "1px #fff",
+                        // fontWeight: "bold"
+                        fontWeight: 500
                     }}
                 >
                     {input}
@@ -274,7 +277,18 @@ const AnnotatorInput = ({ element }) => {
                     disableTip: true,
                     id: `data-annotate-id-${id}`,
                 });
-                element_overlay.inspect([ele], input, true);
+
+                let isElementIselftFixedOrSticky =
+                    window.getComputedStyle(ele).position === 'fixed' || window.getComputedStyle(ele).position === 'sticky';
+
+                const fixedOrAbsoluteAncestor =
+                    Boolean(ele.closest('[style*="position: fixed"], [style*="position: sticky"]'));
+
+                if (isElementIselftFixedOrSticky || fixedOrAbsoluteAncestor) {
+                    element_overlay.inspect([ele], input, true, 'fixed');
+                } else {
+                    element_overlay.inspect([ele], input, true);
+                }
             });
         });
 

@@ -153,7 +153,7 @@ const assign = Object.assign
 // The colors below were chosen to roughly match those used by Chrome devtools.
 
 class OverlayRect {
-  constructor(doc, container, annotated) {
+  constructor(doc, container, annotated, position) {
     this.node = doc.createElement("div")
     this.border = doc.createElement("div")
     this.padding = doc.createElement("div")
@@ -169,16 +169,16 @@ class OverlayRect {
     if (annotated) {
       let transparent = "transparent"
 
-      this.content.style.backgroundColor = transparent 
-      this.border.style.borderColor = transparent 
-      this.padding.style.borderColor = transparent 
+      this.content.style.backgroundColor = transparent
+      this.border.style.borderColor = transparent
+      this.padding.style.borderColor = transparent
 
       this.content.style.border = '3px solid ' + "red"
 
       assign(this.node.style, {
         borderColor: transparent,
         pointerEvents: "none",
-        position: "absolute",
+        position: position || "absolute",
       })
     } else {
       this.content.style.backgroundColor = overlayStyles.background
@@ -331,7 +331,7 @@ export default class Overlay {
     }
   }
 
-  inspect(nodes, name, annotated) {
+  inspect(nodes, name, annotated, position) {
     // We can't get the size of text nodes or comment nodes. React as of v15
     // heavily uses comment nodes to delimit text.
     const elements = nodes.filter(node => node.nodeType === Node.ELEMENT_NODE)
@@ -345,7 +345,7 @@ export default class Overlay {
     }
 
     while (this.rects.length < elements.length) {
-      this.rects.push(new OverlayRect(this.window.document, this.container, annotated))
+      this.rects.push(new OverlayRect(this.window.document, this.container, annotated, position))
     }
 
     const outerBox = {
