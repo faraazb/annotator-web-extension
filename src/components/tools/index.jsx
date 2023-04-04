@@ -50,7 +50,7 @@ const Tools = () => {
         };
     }, []);
 
-    const takeFullPageScreenshot = async (options) => {
+    const takeFullPageScreenshot = async (options = {}) => {
         const { save = true, upload = false, compress = true } = options;
         setUpload(upload);
         // disable pointer events to prevent hover styles
