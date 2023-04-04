@@ -6,10 +6,18 @@
     /* width: 100%; */
 }
 
-#annotator-board-container {
+#annotator-board-elements-container {
     position: absolute;
     top: 0;
     z-index: 10000000 !important;
+    /* height: 100%; */
+    /* width: 100%; */
+}
+
+#annotator-board-container {
+    position: absolute;
+    top: 0;
+    z-index: 9999999 !important;
     /* height: 100%; */
     /* width: 100%; */
 }

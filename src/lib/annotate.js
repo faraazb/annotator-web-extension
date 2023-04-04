@@ -11,7 +11,7 @@ let inspecting = false;
 const mousePos = { x: 0, y: 0 };
 
 const canIgnore = (target) => {
-    const annotateParent = target.closest('[id^="annotator"]');
+    const annotateParent = target.closest('[data-annotator-ui="true"]');
 
     if (annotateParent) {
         return true;
@@ -83,7 +83,8 @@ const handleShadowElementClick = (target) => {
     renderLabel(target);
 }
 
-const renderLabel = (target) => {
+const renderLabel = (target, annotatorInputprops = {}) => {
+    const { onInputSubmit, onInputCancel, onDelete, showAnnotateSimilar } = annotatorInputprops;
 
     if (!target) return;
 
@@ -98,13 +99,19 @@ const renderLabel = (target) => {
 
     let annotatorInput = document.createElement("div");
     annotatorInput.id = "annotator-input";
-    render(<AnnotatorInput element={target} />, annotatorInput);
+    render(<AnnotatorInput
+        element={target}
+        onInputSubmit={onInputSubmit}
+        onInputCancel={onInputCancel}
+        onDelete={onDelete}
+        showAnnotateSimilar={showAnnotateSimilar}
+    />, annotatorInput);
 
     let app_container = document.getElementById("annotator-app-container");
     app_container.appendChild(annotatorInput);
 
-    let paddingTop = parseInt(window.getComputedStyle(target).paddingTop, 10);
-    let paddingBottom = parseInt(window.getComputedStyle(target).paddingBottom, 10);
+    let paddingTop = parseInt(window.getComputedStyle(target).paddingTop, 10) || 0;
+    let paddingBottom = parseInt(window.getComputedStyle(target).paddingBottom, 10) || 0;
 
     createPopper(target, annotatorInput, {
         modifiers: [
@@ -119,7 +126,7 @@ const renderLabel = (target) => {
                             return [0, -paddingBottom + 16]
                         }
                         else {
-                            return [0, 0];
+                            return [0, 16];
                         }
                     },
                 }

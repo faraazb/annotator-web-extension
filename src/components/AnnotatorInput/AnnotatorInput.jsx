@@ -21,7 +21,7 @@ function generateUUID() {
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function({ title }) {
+    return function ({ title }) {
         return (
             !inputValue || title.toLowerCase().includes(lowerCasedInputValue)
         );
@@ -69,7 +69,7 @@ const Checkbox = () => {
                 className="checkbox_check"
                 onClick={handleClick}
                 style={{
-                    all: 'unset',
+                    all: "unset",
                     width: "14px",
                     height: "14px",
                     borderRadius: "3px",
@@ -82,7 +82,7 @@ const Checkbox = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     outline: "none",
-                    cursor: "pointer"
+                    cursor: "pointer",
                 }}
             >
                 {checked_signal.value ? (
@@ -117,7 +117,14 @@ const Checkbox = () => {
     );
 };
 
-const AnnotatorInput = ({ element }) => {
+const AnnotatorInput = (props) => {
+    const {
+        element,
+        onInputSubmit,
+        onInputCancel,
+        onDelete,
+        showAnnotateSimilar = true,
+    } = props;
     // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
     /** @type [{title: string, value: {x: string, y: string, id: string}[]}[], any]*/
     const [items, setItems] = useState(
@@ -170,7 +177,13 @@ const AnnotatorInput = ({ element }) => {
             ele.setAttribute("data-annotate-title", input);
             ele.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
 
-            xys.push({ x, y, id, width: ele.getBoundingClientRect().width, height: ele.getBoundingClientRect().height });
+            xys.push({
+                x,
+                y,
+                id,
+                width: ele.getBoundingClientRect().width,
+                height: ele.getBoundingClientRect().height,
+            });
 
             let element_styels = window.getComputedStyle(ele);
 
@@ -200,7 +213,7 @@ const AnnotatorInput = ({ element }) => {
                         display: "block",
                         marginLeft: paddingLeft + "px",
                         "-webkit-text-stroke": "1px #fff",
-                        fontWeight: "bold"
+                        fontWeight: "bold",
                     }}
                 >
                     {input}
@@ -261,11 +274,13 @@ const AnnotatorInput = ({ element }) => {
                     to_compare.forEach((e) => {
                         let collides = detectCollision(e, my_element);
                         if (collides) {
-                            popper_instance.setOptions({
-                                placement: 'bottom',
-                            }).then(() => {
-                                popper_instance.forceUpdate()
-                            })
+                            popper_instance
+                                .setOptions({
+                                    placement: "bottom",
+                                })
+                                .then(() => {
+                                    popper_instance.forceUpdate();
+                                });
                         }
                     });
                 }
@@ -298,6 +313,10 @@ const AnnotatorInput = ({ element }) => {
                     value: [...xys],
                 },
             ]);
+        }
+
+        if (onInputSubmit) {
+            onInputSubmit();
         }
 
         removeAnnotatorInput();
@@ -396,6 +415,18 @@ const AnnotatorInput = ({ element }) => {
 
         document.getElementById(`data-annotate-id-${id}`).remove();
 
+        if (onDelete) {
+            onDelete();
+        }
+
+        removeAnnotatorInput();
+    };
+
+    const handleCancel = () => {
+        let input = document.querySelector(".annotator-combobox__input").value;
+        if (onInputCancel) {
+            onInputCancel(input);
+        }
         removeAnnotatorInput();
     };
 
@@ -409,13 +440,15 @@ const AnnotatorInput = ({ element }) => {
                     }
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => { }}
+                    setSelectedItem={() => {}}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
-                    <div>
-                        <Checkbox />
-                    </div>
+                    {showAnnotateSimilar && (
+                        <div>
+                            <Checkbox />
+                        </div>
+                    )}
 
                     <div
                         style={{
@@ -461,7 +494,7 @@ const AnnotatorInput = ({ element }) => {
 
                         <div>
                             <button
-                                onClick={() => removeAnnotatorInput()}
+                                onClick={() => handleCancel()}
                                 style={styles.btn_secondary}
                             >
                                 Cancel

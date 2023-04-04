@@ -33,12 +33,12 @@ const Board = () => {
     const canvasContainer = useRef();
 
     useEffect(() => {
-        console.log("Board rendered");
+        // console.log("Board rendered");
         const [drawRectangle] = initCanvas();
     }, []);
 
     useEffect(() => {
-        console.log("Tool changed");
+        // console.log("Tool changed");
         toolId = selectedTool;
         const markerrBoardContainer = document.getElementById(
             "annotator-board-container"
@@ -107,39 +107,32 @@ const initCanvas = () => {
         height: height,
     });
     let layer = new Konva.Layer({ draggable: false });
-    // let secondaryLayer = new Konva.Layer({ draggable: false });
-    // secondaryLayer.size({
-    //     height: 100,
-    //     width: 100,
-    // });
-    // console.log(secondaryLayer.height());
 
     stage.add(layer);
-    // stage.add(secondaryLayer);
     stage.draw();
 
-    let transformer = new Konva.Transformer({ ignoreStroke: true });
-    layer.add(transformer);
+    // let transformer = new Konva.Transformer({ ignoreStroke: true });
+    // layer.add(transformer);
 
     const stageContainer = stage.container();
     stageContainer.tabIndex = 1;
 
-    document.addEventListener("scroll", (event) => {
-        scrollAdjustNodes.forEach((node) => {
-            const { x, y, top, left } = node.element.getBoundingClientRect();
-            const { height } =
-                node.markerrNodeLabelContainer.getBoundingClientRect();
-            // console.log(y + window.scrollY);
-            node.position({ x: x, y: y + window.scrollY });
-            node.markerrNodeLabelContainer.style.top = `${top - height - 5}px`;
-            // maybe apply the position related propeties of the
-            // parent node that was sticky or fixed
-            node.markerrNodeLabelContainer.style.position = "fixed";
+    // document.addEventListener("scroll", (event) => {
+    //     scrollAdjustNodes.forEach((node) => {
+    //         const { x, y, top, left } = node.element.getBoundingClientRect();
+    //         const { height } =
+    //             node.markerrNodeLabelContainer.getBoundingClientRect();
+    //         // console.log(y + window.scrollY);
+    //         node.position({ x: x, y: y + window.scrollY });
+    //         node.markerrNodeLabelContainer.style.top = `${top - height - 5}px`;
+    //         // maybe apply the position related propeties of the
+    //         // parent node that was sticky or fixed
+    //         node.markerrNodeLabelContainer.style.position = "fixed";
 
-            if (node.markerrSelectSimilarButton) {
-            }
-        });
-    });
+    //         if (node.markerrSelectSimilarButton) {
+    //         }
+    //     });
+    // });
 
     // draw a dotted rectangle preview
     let draftRectangle = new Konva.Rect({
@@ -154,26 +147,26 @@ const initCanvas = () => {
     layer.add(draftRectangle);
 
     // selection rectangle
-    let selectionRectangle = new Konva.Rect({
-        fill: "rgba(113, 52, 205, 0.1)",
-        stroke: "rgba(113, 52, 205)",
-        strokeWidth: 1,
-        visible: false,
-    });
-    layer.add(selectionRectangle);
+    // let selectionRectangle = new Konva.Rect({
+    //     fill: "rgba(113, 52, 205, 0.1)",
+    //     stroke: "rgba(113, 52, 205)",
+    //     strokeWidth: 1,
+    //     visible: false,
+    // });
+    // layer.add(selectionRectangle);
 
     // keyboard events - delete
     stageContainer.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" || e.key === "Delete") {
             e.preventDefault();
             selectedShapes.forEach((shape) => {
-                shape.markerrNodeLabelContainer.remove();
-                if (shape.node) {
-                    shape.node.dataset.markerr = "deleted";
-                }
-                if (shape.markerrSelectSimilarButton) {
-                    shape.markerrSelectSimilarButton.remove();
-                }
+                // shape.markerrNodeLabelContainer.remove();
+                // if (shape.node) {
+                //     shape.node.dataset.markerr = "deleted";
+                // }
+                // if (shape.markerrSelectSimilarButton) {
+                //     shape.markerrSelectSimilarButton.remove();
+                // }
                 shape.destroy();
             });
             selectShapes([]);
@@ -248,9 +241,10 @@ const initCanvas = () => {
             width: width,
             height: height,
             stroke: "red",
-            strokeWidth: 4,
-            listening: true,
-            draggable: true,
+            strokeWidth: 3,
+            dash: [2, 2],
+            listening: false,
+            draggable: false,
             strokeScaleEnabled: false,
             rest,
         });
@@ -258,133 +252,63 @@ const initCanvas = () => {
         newRect.markerrId = crypto.randomUUID();
         newRect.markerrLabel = "";
 
-        const labelContainer = el(`div#${newRect.markerrId}`, {
-            style: `position: absolute; 
-                top: ${y + height + 5}px; 
-                left: ${x}px; 
-                z-index: 9999999;`,
+        const boardElContainer = document.getElementById(
+            "annotator-board-elements-container"
+        );
+
+        const labelContainer = el(`div`, {
+            style: `position: absolute;
+                top: ${y}px; 
+                left: ${x}px;
+                height: ${height}px;
+                width: ${width}px;
+                z-index: 999999x;`,
+        });
+        labelContainer.addEventListener("click", () => {
+            if (toolId === tools.RECTANGLE) {
+                renderLabel(labelContainer, {
+                    onInputSubmit: () => {
+                        newRect.destroy();
+                    },
+                    onInputCancel: (inputValue) => {
+                        newRect.destroy();
+                        if (inputValue.trim() === "") {
+                            labelContainer.remove();
+                        }
+                    },
+                    onDelete: () => {
+                        labelContainer.remove();
+                    },
+                    showAnnotateSimilar: false,
+                });
+            }
         });
         newRect.markerrNodeLabelContainer = labelContainer;
 
-        renderLabel(labelContainer);
-        markerrBoardContainer.appendChild(labelContainer);
-
-        // render(
-        //     <LabelCombobox
-        //         setLabelTitle={(title) => (newRect.markerrLabel = title)}
-        //     />,
-        //     labelContainer
-        // );
-
-        const { y: labelY, height: labelHeight } =
-            labelContainer.getBoundingClientRect();
-
-        labelContainer.style.top = `${y - labelHeight - 5}px`;
-
-        // if (element) {
-        //     newRect.element = element;
-        //     element.dataset.markerr = true;
-        //     const selectSimilarButton = el(
-        //         "button.markerr-select-by-class-button",
-        //         // labelY + labelHeight + window.scrollY + 2
-        //         {
-        //             style: `display: none;
-        //                 position: absolute;
-        //                 top: ${y + height + 5}px;
-        //                 left: ${x}px; z-index: 9999999;`,
-        //             onclick: () => selectElementsByClassName(element.className),
-        //         },
-        //         "Annotate similar"
-        //     );
-
-        //     newRect.markerrSelectSimilarButton = selectSimilarButton;
-
-        //     markerrBoardContainer.appendChild(selectSimilarButton);
-
-        //     if (adjustOnScroll) {
-        //         scrollAdjustNodes.push(newRect);
-        //     }
-        // }
-
-        // let hideSimilarTimeout;
-        // newRect.on("mouseover", (event) => {
-        //     clearTimeout(hideSimilarTimeout);
-        //     const { markerrSelectSimilarButton: selectSimilarButton } = newRect;
-        //     if (selectSimilarButton) {
-        //         selectSimilarButton.style.display = "block";
-        //     }
-        //     if (newRect.markerrLabel === "") {
-        //         labelContainer.style.display = "block";
-        //         labelContainer.placeholder = "Add a label";
-        //     }
-        // });
-
-        // newRect.on("mouseleave", (event) => {
-        //     const { markerrSelectSimilarButton: selectSimilarButton } = newRect;
-
-        //     clearTimeout(hideSimilarTimeout);
-        //     hideSimilarTimeout = setTimeout(() => {
-        //         if (selectSimilarButton) {
-        //             selectSimilarButton.style.display = "none";
-        //         }
-        //         if (newRect.markerrLabel === "") {
-        //             labelContainer.style.display = "none";
-        //         }
-        //     }, 1500);
-        // });
-
-        newRect.on("transform", (event) => {
-            // newRect.y() + (newRect.height() * newRect.scaleY()) + 5
-            labelContainer.style.top = `${newRect.y() - labelHeight - 5}px`;
-            labelContainer.style.left = `${newRect.x()}px`;
-
-            // disable select similar button when el annotation is moved
-            if (newRect.markerrSelectSimilarButton) {
-                newRect.markerrSelectSimilarButton.remove();
-                newRect.markerrSelectSimilarButton = undefined;
-            }
-
-            if (newRect.element) {
-                newRect.element.dataset.markerr = "moved";
-            }
+        renderLabel(labelContainer, {
+            onInputSubmit: () => {
+                newRect.destroy();
+            },
+            onInputCancel: (inputValue) => {
+                newRect.destroy();
+                if (inputValue.trim() === "") {
+                    labelContainer.remove();
+                }
+            },
+            onDelete: () => {
+                labelContainer.remove();
+            },
+            showAnnotateSimilar: false,
         });
 
-        newRect.on("dragmove", (event) => {
-            // const { x, y } = newRect.getAbsolutePosition();
-            labelContainer.style.top = `${newRect.y() - labelHeight - 5}px`;
-            labelContainer.style.left = `${newRect.x()}px`;
+        boardElContainer.appendChild(labelContainer);
 
-            // disable select similar button when el annotation is moved
-            if (newRect.markerrSelectSimilarButton) {
-                newRect.markerrSelectSimilarButton.remove();
-                newRect.markerrSelectSimilarButton = undefined;
-            }
-
-            if (newRect.element) {
-                newRect.element.dataset.markerr = "moved";
-            }
-        });
-
-        // if (adjustOnScroll) {
-        //     secondaryLayer.add(newRect);
-        // } else {
-        //     layer.add(newRect);
-        // }
         layer.add(newRect);
         stage.draw();
-
-        // const labelInput = document.querySelector(`#${newRect.markerrId} input`);
-        // if (labelInput && labelInput instanceof HTMLInputElement) {
-        //     if (focusLabel) {
-        //         labelInput.focus();
-        //     } else {
-        //         labelInput.style.display = "none";
-        //     }
-        // }
     }
 
     // drag from and to positions
-    let x1, y1, x2, y2;
+    // let x1, y1, x2, y2;
 
     stage.on("mousedown touchstart", (e) => {
         // do nothing if we mousedown on any shape
@@ -393,24 +317,32 @@ const initCanvas = () => {
         }
         e.evt.preventDefault();
 
-        if (toolId === 1) {
-            mode = "selecting";
-            x1 = stage.getPointerPosition().x;
-            y1 = stage.getPointerPosition().y;
-            x2 = stage.getPointerPosition().x;
-            y2 = stage.getPointerPosition().y;
-
-            selectionRectangle.visible(true);
-            selectionRectangle.width(0);
-            selectionRectangle.height(0);
-            return;
-        } else if (mode !== "drawing") {
+        if (mode !== "drawing") {
             mode = "drawing";
             if (toolId === 2) {
                 startDrag({ x: e.evt.layerX, y: e.evt.layerY });
                 return;
             }
         }
+
+        // if (toolId === 1) {
+        //     mode = "selecting";
+        //     x1 = stage.getPointerPosition().x;
+        //     y1 = stage.getPointerPosition().y;
+        //     x2 = stage.getPointerPosition().x;
+        //     y2 = stage.getPointerPosition().y;
+
+        //     selectionRectangle.visible(true);
+        //     selectionRectangle.width(0);
+        //     selectionRectangle.height(0);
+        //     return;
+        // } else if (mode !== "drawing") {
+        //     mode = "drawing";
+        //     if (toolId === 2) {
+        //         startDrag({ x: e.evt.layerX, y: e.evt.layerY });
+        //         return;
+        //     }
+        // }
     });
 
     stage.on("mousemove touchmove", (e) => {
@@ -421,25 +353,25 @@ const initCanvas = () => {
             }
         }
         // do nothing if we didn't start selection
-        if (!selectionRectangle.visible()) {
-            return;
-        }
-        e.evt.preventDefault();
+        // if (!selectionRectangle.visible()) {
+        //     return;
+        // }
+        // e.evt.preventDefault();
 
-        // update drag to position
-        x2 = stage.getPointerPosition().x;
-        y2 = stage.getPointerPosition().y;
+        // // update drag to position
+        // x2 = stage.getPointerPosition().x;
+        // y2 = stage.getPointerPosition().y;
 
-        selectionRectangle.setAttrs({
-            x: Math.min(x1, x2),
-            y: Math.min(y1, y2),
-            width: Math.abs(x2 - x1),
-            height: Math.abs(y2 - y1),
-        });
+        // selectionRectangle.setAttrs({
+        //     x: Math.min(x1, x2),
+        //     y: Math.min(y1, y2),
+        //     width: Math.abs(x2 - x1),
+        //     height: Math.abs(y2 - y1),
+        // });
     });
 
     stage.on("mouseup touchend", (e) => {
-        stageContainer.focus();
+        // stageContainer.focus();
         if (mode === "drawing") {
             mode = "";
             if (toolId === 2) {
@@ -464,74 +396,74 @@ const initCanvas = () => {
         }
 
         // do nothing if we didn't start selection
-        if (!selectionRectangle.visible()) {
-            return;
-        }
+        // if (!selectionRectangle.visible()) {
+        //     return;
+        // }
 
-        mode = "";
-        e.evt.preventDefault();
+        // mode = "";
+        // e.evt.preventDefault();
 
-        // update visibility in timeout, so we can check it in click event
-        setTimeout(() => {
-            selectionRectangle.visible(false);
-        });
+        // // update visibility in timeout, so we can check it in click event
+        // setTimeout(() => {
+        //     selectionRectangle.visible(false);
+        // });
 
-        let shapes = stage.find(".rect");
-        let box = selectionRectangle.getClientRect();
-        const nodes = shapes.filter((shape) =>
-            Konva.Util.haveIntersection(box, shape.getClientRect())
-        );
-        selectShapes(nodes);
+        // let shapes = stage.find(".rect");
+        // let box = selectionRectangle.getClientRect();
+        // const nodes = shapes.filter((shape) =>
+        //     Konva.Util.haveIntersection(box, shape.getClientRect())
+        // );
+        // selectShapes(nodes);
 
-        // nothing selected, clicked on stage, remove focus from annotation label
-        if (nodes.length === 0) {
-            if (document.activeElement instanceof HTMLInputElement) {
-                document.activeElement.blur();
-            }
-        }
+        // // nothing selected, clicked on stage, remove focus from annotation label
+        // if (nodes.length === 0) {
+        //     if (document.activeElement instanceof HTMLInputElement) {
+        //         document.activeElement.blur();
+        //     }
+        // }
     });
 
     // clicks should select/deselect shapes
-    stage.on("click tap", function (e) {
-        // if we are selecting with rect, do nothing
-        if (selectionRectangle.visible()) {
-            return;
-        }
+    // stage.on("click tap", function (e) {
+    //     // if we are selecting with rect, do nothing
+    //     if (selectionRectangle.visible()) {
+    //         return;
+    //     }
 
-        // if click on empty area - remove all selections
-        if (e.target === stage) {
-            // stageContainer.focus();
-            selectShapes([]);
-            return;
-        }
+    //     // if click on empty area - remove all selections
+    //     if (e.target === stage) {
+    //         // stageContainer.focus();
+    //         selectShapes([]);
+    //         return;
+    //     }
 
-        // Rectangle shape name mismatch
-        if (!e.target.hasName("rect")) {
-            return;
-        }
+    //     // Rectangle shape name mismatch
+    //     if (!e.target.hasName("rect")) {
+    //         return;
+    //     }
 
-        const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
-        const isSelected = transformer.nodes().indexOf(e.target) >= 0;
+    //     const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
+    //     const isSelected = transformer.nodes().indexOf(e.target) >= 0;
 
-        if (!metaPressed && !isSelected) {
-            // select single shape
-            selectShapes([e.target]);
-        } else if (metaPressed && isSelected) {
-            // remove selected node if meta key is pressed
-            const nodes = transformer.nodes().slice();
-            nodes.splice(nodes.indexOf(e.target), 1);
-            selectShapes(nodes);
-        } else if (metaPressed && !isSelected) {
-            // add a node to selectedShapes
-            const nodes = transformer.nodes().concat([e.target]);
-            selectShapes(nodes);
-        }
-    });
+    //     if (!metaPressed && !isSelected) {
+    //         // select single shape
+    //         selectShapes([e.target]);
+    //     } else if (metaPressed && isSelected) {
+    //         // remove selected node if meta key is pressed
+    //         const nodes = transformer.nodes().slice();
+    //         nodes.splice(nodes.indexOf(e.target), 1);
+    //         selectShapes(nodes);
+    //     } else if (metaPressed && !isSelected) {
+    //         // add a node to selectedShapes
+    //         const nodes = transformer.nodes().concat([e.target]);
+    //         selectShapes(nodes);
+    //     }
+    // });
 
-    function selectShapes(shapes) {
-        selectedShapes = shapes;
-        transformer.nodes(shapes);
-    }
+    // function selectShapes(shapes) {
+    //     selectedShapes = shapes;
+    //     transformer.nodes(shapes);
+    // }
 
     // reverse co-ords if user drags left / up
     function reverse({ x: x1, y: y1 }, { x: x2, y: y2 }) {
@@ -553,17 +485,6 @@ const initCanvas = () => {
 };
 
 export default Board;
-
-// el("div", "hello world!")
-// el("div", {onclick: update})
-// el("div", [])
-//
-// el("", attrs, child)
-// el("", children, text)
-// el ("", attrs, text)
-//
-// argument(s) can be dropped but must strictly follow order
-// ele, attributes, children, innerText
 
 const regexEl = /^([^#\.\n]+)(.|#)?/gm;
 const regexCssId = /#([^.#\n]+)/gm;
@@ -636,17 +557,3 @@ export function icon(ele, svgString) {
     e.innerHTML = svgString;
     return e;
 }
-
-// const append = function (el) {
-//     console.log(el);
-//     document.body.appendChild(el);
-// }
-
-// append(el("div", "Hello world!"));
-// append(el("div#main", { style: "background-color: red" }));
-// append(el("div.hello", [el("div.world", "Wow, this worked")]));
-
-// append(el("div", { onclick: () => console.log("hello world") }, [el("p.para", "This is an onlick div")]));
-// append(el("div", [el("p", "Hiii!!")], "Inner hi will come before para"))
-
-// append(el("div", { onclick: () => console.log("hello world") }, [el("p.para", "This is an onlick div")], "Inner text"));

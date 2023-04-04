@@ -72,14 +72,21 @@ const prepareDOM = () => {
 const initApp = () => {
     prepareDOM();
     const appContainer = document.createElement("div");
+    appContainer.dataset.annotatorUi = true;
     appContainer.id = "annotator-app-container";
     document.body.appendChild(appContainer);
 
     const boardContainer = document.createElement("div");
+    boardContainer.dataset.annotatorUi = true;
     boardContainer.id = "annotator-board-container";
     document.body.appendChild(boardContainer);
 
+    const boardElContainer = document.createElement("div");
+    boardElContainer.id = "annotator-board-elements-container";
+    document.body.appendChild(boardElContainer);
+
     const toolsContainer = document.createElement("div");
+    toolsContainer.dataset.annotatorUi = true;
     toolsContainer.id = "annotator-tools-container";
     document.body.appendChild(toolsContainer);
 

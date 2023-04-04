@@ -88,12 +88,14 @@ async function submitPageAnnotation({ screenshotURL, name, annotations, email })
     // Prepare labels text file with the structure:
     // label,x,y,width,height\n
     const labelsData = annotations.map(
-        ({ x, y, width, height, label }) =>
-            [label, x, y, width, height]).join("\n");
+        ({ x, y, width, height, title }) =>
+            [title, x, y, width, height]).join("\n");
     const labelsBlob = new Blob([labelsData], { type: "text/plain" });
     const labelsFile = new File([labelsBlob], "labels.txt", {
         type: "text/plain",
     });
+
+    // console.log(labelsData);
 
     const response = await createAnnotation({
         screenshot: dataURLtoFile(screenshotURL, name),
