@@ -69,10 +69,14 @@ const Tools = () => {
     }, []);
 
     const takeFullPageScreenshot = async (
-        shouldSaveLocally = true,
-        shouldUpload = false
+        options = {
+            save: true,
+            upload: false,
+            compress: true,
+        }
     ) => {
-        setUpload(shouldUpload);
+        const { save, upload, compress } = options;
+        setUpload(upload);
         // disable pointer events to prevent hover styles
         document.body.style.pointerEvents = "none";
 
@@ -92,8 +96,9 @@ const Tools = () => {
             // because everything in the capture-api is callback based
             await takeScreenshot({
                 tab: tabs[0],
-                shouldSaveLocally,
-                shouldUpload,
+                shouldSaveLocally: save,
+                shouldUpload: upload,
+                compress: compress,
             });
         }
         // this creates problem
@@ -260,10 +265,10 @@ const Tools = () => {
                                             <button
                                                 className="ss-menu-button"
                                                 onClick={() =>
-                                                    takeFullPageScreenshot(
-                                                        false,
-                                                        true
-                                                    )
+                                                    takeFullPageScreenshot({
+                                                        save: false,
+                                                        upload: true,
+                                                    })
                                                 }
                                             >
                                                 <span className="ss-menu-button__icon">

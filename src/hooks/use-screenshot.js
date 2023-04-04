@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import CaptureAPI from "../capture-api";
-import { blobToDataURL } from "../utils/blob";
+import imageBlobReduce from "image-blob-reduce";
+// import { blobToDataURL, convertFileSize } from "../utils/blob";
 
 
 const useScreenshot = () => {
@@ -26,21 +27,48 @@ const useScreenshot = () => {
         return "screencapture" + name + "-" + Date.now() + ".png";
     }
 
-    async function displayCaptures(blobs, shouldSaveLocally, shouldUpload) {
+    function max(nums) {
+        return Math.max.apply(
+            Math,
+            nums.filter(function (x) {
+                return x;
+            })
+        );
+    }
+
+    async function displayCaptures(blobs, shouldSaveLocally, shouldUpload, compress = false) {
         if (!blobs || !blobs.length) {
             setError("Couldn't take screenshot")
             return;
         }
+        let screenshotBlobs = blobs;
+        if (compress) {
+            screenshotBlobs = [];
+            for (const { blob, name } of blobs) {
+                // console.log(convertFileSize(blob.size))
+
+                const { fullWidth, fullHeight } = CaptureAPI.getDimensions();
+                // scale larger side down by 75%
+                let max = (fullHeight > fullWidth ? fullHeight : fullWidth) * 0.75;
+                // console.log(fullHeight, fullWidth, max)
+
+                const compressedBlob = await imageBlobReduce().toBlob(blob, { max: max });
+                // console.log(convertFileSize(compressedBlob.size))
+                screenshotBlobs.push({ blob: compressedBlob, name });
+            }
+        }
+
 
         const screenshotId = crypto.randomUUID();
         setId(screenshotId);
-        setScreenshot(blobs)
+        setScreenshot(screenshotBlobs)
 
         const files = [];
 
         // Save each file, triggers browser's multiple save permission box
 
-        for (const { blob, name } of blobs) {
+        for (const { blob, name } of screenshotBlobs) {
+
             if (shouldSaveLocally) {
                 let link = document.createElement("a");
                 let url = URL.createObjectURL(blob);
@@ -88,14 +116,14 @@ const useScreenshot = () => {
         setSplitted(true);
     }
 
-    const takeScreenshot = ({ tab, shouldSaveLocally = false, shouldUpload = false }) => {
+    const takeScreenshot = ({ tab, shouldSaveLocally = false, shouldUpload = false, compress = false }) => {
         if (!tab) {
             throw new Error("Missing tab argument");
         }
         CaptureAPI.captureToFiles(
             tab,
             getFilename(tab.url),
-            (blobs) => displayCaptures(blobs, shouldSaveLocally, shouldUpload),
+            (blobs) => displayCaptures(blobs, shouldSaveLocally, shouldUpload, compress),
             errorHandler,
             updateProgress,
             splitNotifier

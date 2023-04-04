@@ -1,3 +1,5 @@
+import { convertFileSize } from "./utils/blob";
+
 class API {
     constructor({ baseUrl, options }) {
         this.baseUrl = baseUrl || "";
@@ -84,13 +86,15 @@ const createAnnotation = async ({ screenshot, annotations, email }) => {
     // console.log(Array.from(formData.entries()))
     // console.log(user.email)
 
+    console.log(convertFileSize(screenshot.size))
+
     // header object is overwritten, no application/json for this one
-    return await api.post(routes.submit, {
-        mode: "cors",
-        headers: { "email": email },
-        redirect: "follow",
-        body: formData
-    });
+    // return await api.post(routes.submit, {
+    //     mode: "cors",
+    //     headers: { "email": email },
+    //     redirect: "follow",
+    //     body: formData
+    // });
 }
 
 export {

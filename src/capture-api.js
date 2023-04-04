@@ -270,6 +270,29 @@ const CaptureAPI = (function () {
         );
     }
 
+    function getDimensions() {
+        let widths = [
+            document.documentElement.clientWidth,
+            body ? body.scrollWidth : 0,
+            document.documentElement.scrollWidth,
+            body ? body.offsetWidth : 0,
+            document.documentElement.offsetWidth,
+        ];
+        let
+            heights = [
+                document.documentElement.clientHeight,
+                body ? body.scrollHeight : 0,
+                document.documentElement.scrollHeight,
+                body ? body.offsetHeight : 0,
+                document.documentElement.offsetHeight,
+                // (Array.prototype.slice.call(document.getElementsByTagName('*'), 0)
+                //  .reduce(function(val, elt) {
+                //      let h = elt.offsetHeight; return h > val ? h : val;
+                //  }, 0))
+            ];
+        return { fullWidth: max(widths), fullHeight: max(heights) };
+    }
+
     function getPositions(callback, takeScreenshot) {
         preScreenshotCleanup();
 
@@ -285,26 +308,9 @@ const CaptureAPI = (function () {
             body.style.overflowY = "visible";
         }
 
-        let widths = [
-            document.documentElement.clientWidth,
-            body ? body.scrollWidth : 0,
-            document.documentElement.scrollWidth,
-            body ? body.offsetWidth : 0,
-            document.documentElement.offsetWidth,
-        ],
-            heights = [
-                document.documentElement.clientHeight,
-                body ? body.scrollHeight : 0,
-                document.documentElement.scrollHeight,
-                body ? body.offsetHeight : 0,
-                document.documentElement.offsetHeight,
-                // (Array.prototype.slice.call(document.getElementsByTagName('*'), 0)
-                //  .reduce(function(val, elt) {
-                //      let h = elt.offsetHeight; return h > val ? h : val;
-                //  }, 0))
-            ],
-            fullWidth = max(widths),
-            fullHeight = max(heights),
+        const { fullHeight, fullWidth } = getDimensions();
+
+        let
             windowWidth = window.innerWidth,
             windowHeight = window.innerHeight,
             arrangements = [],
@@ -439,8 +445,9 @@ const CaptureAPI = (function () {
 
 
     return {
-        captureToBlobs: captureToBlobs,
-        captureToFiles: captureToFiles,
+        captureToBlobs,
+        captureToFiles,
+        getDimensions
     };
 })();
 
