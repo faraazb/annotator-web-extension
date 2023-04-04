@@ -32,7 +32,6 @@ const Home = () => {
     };
 
     const logoutFromGoogle = async () => {
-        setToolsOpen(false);
         const response = await chrome.runtime.sendMessage({ action: "LOGOUT" });
         if (response.ok) {
             setUser(null);
