@@ -6,14 +6,7 @@ import useScreenshot from "../../hooks/use-screenshot";
 import { exitInspectorMode, startInspectorMode } from "../../lib/annotate";
 import { useStore } from "../../store";
 import { blobToDataURL } from "../../utils/blob";
-import {
-    Camera,
-    Download,
-    DragHandle,
-    RectangleTool,
-    SendPlane,
-    Spline,
-} from "../icons";
+import { Camera, Download, DragHandle, RectangleTool, SendPlane, Spline } from "../icons";
 // import "./tools.css";
 
 const Tools = () => {
@@ -21,14 +14,7 @@ const Tools = () => {
     const [selectedTool, setSelectedTool] = useStore.selectedTool();
     const [open, setOpen] = useStore.toolsOpen();
     const [screenshotMenuOpen, setScreenshotMenuOpen] = useState(false);
-    const [
-        screenshotId,
-        takeScreenshot,
-        screenshot,
-        progress,
-        splitted,
-        error,
-    ] = useScreenshot();
+    const [screenshotId, takeScreenshot, screenshot, progress, splitted, error] = useScreenshot();
     const [upload, setUpload] = useState(false);
 
     const [referenceElement, setReferenceElement] = useState(null);
@@ -57,22 +43,16 @@ const Tools = () => {
                 }
             }
         })();
-        document.body.addEventListener("mouseenter", () =>
-            setScreenshotMenuOpen(false)
-        );
+        document.body.addEventListener("mouseenter", () => setScreenshotMenuOpen(false));
 
         return () => {
-            document.body.removeEventListener("mouseenter", () =>
-                setScreenshotMenuOpen(false)
-            );
+            document.body.removeEventListener("mouseenter", () => setScreenshotMenuOpen(false));
         };
     }, []);
 
-    const takeFullPageScreenshot = async (
-        shouldSaveLocally = true,
-        shouldUpload = false
-    ) => {
-        setUpload(shouldUpload);
+    const takeFullPageScreenshot = async (options) => {
+        const { save = true, upload = false, compress = true } = options;
+        setUpload(upload);
         // disable pointer events to prevent hover styles
         document.body.style.pointerEvents = "none";
 
@@ -92,8 +72,9 @@ const Tools = () => {
             // because everything in the capture-api is callback based
             await takeScreenshot({
                 tab: tabs[0],
-                shouldSaveLocally,
-                shouldUpload,
+                shouldSaveLocally: save,
+                shouldUpload: upload,
+                compress: compress,
             });
         }
         // this creates problem
@@ -168,55 +149,36 @@ const Tools = () => {
         <>
             {open && (
                 <Draggable handle="#annotator-drag-handle" bounds="body">
-                    <div
-                        id="annotator-tools"
-                        className={"annotator-panel"}
-                        tabIndex={-1}
-                    >
+                    <div id="annotator-tools" className={"annotator-panel"} tabIndex={-1}>
                         <div id="annotator-drag-handle" className="drag-handle">
                             <span className="panel-drag-handle">
                                 <DragHandle transform={"rotate(90)"} />
                             </span>
                         </div>
                         <div className="annotator-tools__buttons">
-                            {tools.map(
-                                ({
-                                    id,
-                                    Icon,
-                                    onClick,
-                                    ref,
-                                    onMouseOver,
-                                    onMouseLeave,
-                                    styles = {},
-                                }) => {
-                                    return (
-                                        <button
-                                            ref={ref}
-                                            onMouseEnter={onMouseOver}
-                                            // onMouseLeave={onMouseLeave}
-                                            tabIndex={-1}
-                                            key={`annotator-tool-${id}`}
-                                            className={`tool-button${
-                                                id === selectedTool
-                                                    ? " " +
-                                                      "tool-button--selected"
-                                                    : ""
-                                            }`}
-                                            onClick={
-                                                onClick ||
-                                                (() => {
-                                                    setSelectedTool(id);
-                                                })
-                                            }
-                                            style={styles}
-                                        >
-                                            <span className="tool-button__icon">
-                                                {Icon}
-                                            </span>
-                                        </button>
-                                    );
-                                }
-                            )}
+                            {tools.map(({ id, Icon, onClick, ref, onMouseOver, onMouseLeave, styles = {} }) => {
+                                return (
+                                    <button
+                                        ref={ref}
+                                        onMouseEnter={onMouseOver}
+                                        // onMouseLeave={onMouseLeave}
+                                        tabIndex={-1}
+                                        key={`annotator-tool-${id}`}
+                                        className={`tool-button${
+                                            id === selectedTool ? " " + "tool-button--selected" : ""
+                                        }`}
+                                        onClick={
+                                            onClick ||
+                                            (() => {
+                                                setSelectedTool(id);
+                                            })
+                                        }
+                                        style={styles}
+                                    >
+                                        <span className="tool-button__icon">{Icon}</span>
+                                    </button>
+                                );
+                            })}
                         </div>
                         {screenshotMenuOpen && (
                             <div
@@ -225,31 +187,15 @@ const Tools = () => {
                                 style={styles.popper}
                                 {...attributes.popper}
                             >
-                                <div
-                                    ref={setArrowElement}
-                                    style={styles.arrow}
-                                    id="annotator-screenshot-menu-arrow"
-                                />
+                                <div ref={setArrowElement} style={styles.arrow} id="annotator-screenshot-menu-arrow" />
                                 <div
                                     className="screenshot-sub-menu-hover"
-                                    onMouseEnter={() =>
-                                        setScreenshotMenuOpen(true)
-                                    }
+                                    onMouseEnter={() => setScreenshotMenuOpen(true)}
                                 ></div>
-                                <menu
-                                    className="screenshot-sub-menu"
-                                    onMouseLeave={() =>
-                                        setScreenshotMenuOpen(false)
-                                    }
-                                >
+                                <menu className="screenshot-sub-menu" onMouseLeave={() => setScreenshotMenuOpen(false)}>
                                     <ul className="screenshot-sub-menu__items">
                                         <li className="screenshot-sub-menu__item">
-                                            <button
-                                                className="ss-menu-button"
-                                                onClick={() =>
-                                                    takeFullPageScreenshot()
-                                                }
-                                            >
+                                            <button className="ss-menu-button" onClick={() => takeFullPageScreenshot()}>
                                                 <span className="ss-menu-button__icon">
                                                     <Download />
                                                 </span>
@@ -260,10 +206,10 @@ const Tools = () => {
                                             <button
                                                 className="ss-menu-button"
                                                 onClick={() =>
-                                                    takeFullPageScreenshot(
-                                                        false,
-                                                        true
-                                                    )
+                                                    takeFullPageScreenshot({
+                                                        save: false,
+                                                        upload: true,
+                                                    })
                                                 }
                                             >
                                                 <span className="ss-menu-button__icon">
