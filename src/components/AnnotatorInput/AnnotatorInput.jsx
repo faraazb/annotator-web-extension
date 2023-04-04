@@ -77,6 +77,23 @@ function detectCollision(element1, element2) {
     return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
 }
 
+function crossesBorder(el1, el2) {
+    const el1Rect = el1.getBoundingClientRect(); // Get the bounding rectangle of el1
+    const el2Rect = el2.getBoundingClientRect(); // Get the bounding rectangle of el2
+
+    // Check if any of the borders of el1 crosses the borders of el2
+    if (
+        el1Rect.top < el2Rect.top ||
+        el1Rect.right > el2Rect.right ||
+        el1Rect.bottom > el2Rect.bottom ||
+        el1Rect.left < el2Rect.left
+    ) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 const checked_signal = signal(false);
 
 const Checkbox = () => {
@@ -228,7 +245,7 @@ const AnnotatorInput = ({ element }) => {
                         name: "offset",
                         options: {
                             offset: ({ placement }) => {
-                                if (placement === "top-start") {
+                                if (placement === "top") {
                                     return [paddingLeft, -paddingTop];
                                 }
 
@@ -273,16 +290,24 @@ const AnnotatorInput = ({ element }) => {
                     let placement = popper_instance.state.placement;
 
                     if (collided) {
-                        while (collided || placement === "top") {
-                            let current_placement_index = placement_sequence.indexOf(placement);
-                            let next_placement =
-                                placement_sequence[(current_placement_index + 1) % placement_sequence.length];
-                            placement = next_placement;
-                            await popper_instance.setOptions({
-                                placement: next_placement,
-                            });
-                            await popper_instance.update();
-                            collided = detectCollision(item, div);
+                        if (item.contains(ele)) {
+                            console.log(" iam inside bro");
+                        } else {
+                            while (collided) {
+                                let current_placement_index = placement_sequence.indexOf(placement);
+                                let next_placement =
+                                    placement_sequence[(current_placement_index + 1) % placement_sequence.length];
+                                placement = next_placement;
+                                await popper_instance.setOptions({
+                                    placement: next_placement,
+                                });
+                                await popper_instance.update();
+                                collided = detectCollision(item, div);
+
+                                if (placement === "top") {
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
