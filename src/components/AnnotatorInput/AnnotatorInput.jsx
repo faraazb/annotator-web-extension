@@ -155,7 +155,14 @@ const Checkbox = () => {
     );
 };
 
-const AnnotatorInput = ({ element }) => {
+const AnnotatorInput = (props) => {
+    const {
+        element,
+        onInputSubmit,
+        onInputCancel,
+        onDelete,
+        showAnnotateSimilar = true,
+    } = props;
     // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
     /** @type [{title: string, value: {x: string, y: string, id: string}[]}[], any]*/
     const [items, setItems] = useState(JSON.parse(localStorage.getItem("items")) || []);
@@ -344,6 +351,10 @@ const AnnotatorInput = ({ element }) => {
                 });
         }
 
+        if (onInputSubmit) {
+            onInputSubmit();
+        }
+
         removeAnnotatorInput();
     };
 
@@ -442,6 +453,18 @@ const AnnotatorInput = ({ element }) => {
 
         document.getElementById(`data-annotate-id-${id}`).remove();
 
+        if (onDelete) {
+            onDelete();
+        }
+
+        removeAnnotatorInput();
+    };
+
+    const handleCancel = () => {
+        let input = document.querySelector(".annotator-combobox__input").value;
+        if (onInputCancel) {
+            onInputCancel(input);
+        }
         removeAnnotatorInput();
     };
 
@@ -453,13 +476,15 @@ const AnnotatorInput = ({ element }) => {
                     defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => { }}
+                    setSelectedItem={() => {}}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">
-                    <div>
-                        <Checkbox />
-                    </div>
+                    {showAnnotateSimilar && (
+                        <div>
+                            <Checkbox />
+                        </div>
+                    )}
 
                     <div
                         style={{
@@ -504,7 +529,7 @@ const AnnotatorInput = ({ element }) => {
                         </div>
 
                         <div>
-                            <button onClick={() => removeAnnotatorInput()} style={styles.btn_secondary}>
+                            <button onClick={() => handleCancel()} style={styles.btn_secondary}>
                                 Cancel
                             </button>
                             <button

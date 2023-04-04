@@ -1,7 +1,7 @@
 import { initApp } from "../app";
 import { startInspectorMode } from "../lib/annotate"
 
-console.log("content script loaded");
+console.log("Annotator Web Extension's content script");
 
 // inject the app
 async function startAnnotator() {

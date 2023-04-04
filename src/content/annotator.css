@@ -6,18 +6,34 @@
     /* width: 100%; */
 }
 
+#annotator-board-elements-container {
+    position: absolute;
+    top: 0;
+    z-index: 10000000 !important;
+    /* height: 100%; */
+    /* width: 100%; */
+}
+
+#annotator-board-container {
+    position: absolute;
+    top: 0;
+    z-index: 9999999 !important;
+    /* height: 100%; */
+    /* width: 100%; */
+}
+
 #annotator-tools-container {
     position: absolute;
     /* top: 0; */
-    z-index: 10000001 !important;
+    z-index: 10000002 !important;
 }
 
 /* Fixes for screenshot capturing */
-.annotator-fix--sticky {
+/* .annotator-fix--sticky {
     position: relative !important;
     inset: auto !important;
 }
 
 .annotator-fix--fixed {
     position: absolute !important;
-}
+} */
