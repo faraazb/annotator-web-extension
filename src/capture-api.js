@@ -271,6 +271,7 @@ const CaptureAPI = (function () {
     }
 
     function getDimensions() {
+        let body = document.body;
         let widths = [
             document.documentElement.clientWidth,
             body ? body.scrollWidth : 0,
@@ -308,7 +309,7 @@ const CaptureAPI = (function () {
             body.style.overflowY = "visible";
         }
 
-        const { fullHeight, fullWidth } = getDimensions();
+        let { fullHeight, fullWidth } = getDimensions();
 
         let
             windowWidth = window.innerWidth,
