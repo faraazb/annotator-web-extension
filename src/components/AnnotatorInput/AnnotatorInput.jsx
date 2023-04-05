@@ -11,7 +11,7 @@ import { computeStyles, createPopper, Placement } from "@popperjs/core";
 import { createLabel, getLabels } from "../../api";
 
 function is_element_or_its_parents_fixed_or_sticky(node) {
-    while (node && node.nodeName.toLowerCase() !== "body") {
+    while (node && node instanceof Element && node.nodeName.toLowerCase() !== "body") {
         let position = window.getComputedStyle(node).getPropertyValue("position").toLowerCase();
         if (position === "fixed" || position === "sticky") {
             return node;
@@ -63,7 +63,7 @@ function generateUUID() {
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function({ title }) {
+    return function ({ title }) {
         return !inputValue || title.toLowerCase().includes(lowerCasedInputValue);
     };
 }
@@ -162,6 +162,7 @@ const AnnotatorInput = (props) => {
         onInputCancel,
         onDelete,
         showAnnotateSimilar = true,
+        showBoundingBox = true,
     } = props;
     // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
     /** @type [{title: string, value: {x: string, y: string, id: string}[]}[], any]*/
@@ -271,15 +272,18 @@ const AnnotatorInput = (props) => {
                 strategy: "absolute",
             });
 
-            let element_overlay = new Overlay({
-                disableTip: true,
-                id: `data-annotate-id-${id}`,
-            });
+            if (showBoundingBox) {
+                console.log("Showing boudnign box");
+                let element_overlay = new Overlay({
+                    disableTip: true,
+                    id: `data-annotate-id-${id}`,
+                });
 
-            if (is_element_or_its_parents_fixed_or_sticky(ele)) {
-                element_overlay.inspect([ele], input, true, "fixed");
-            } else {
-                element_overlay.inspect([ele], input, true);
+                if (is_element_or_its_parents_fixed_or_sticky(ele)) {
+                    element_overlay.inspect([ele], input, true, "fixed");
+                } else {
+                    element_overlay.inspect([ele], input, true);
+                }
             }
 
             const all_annotated_elements = document.querySelectorAll("[data-annotate-id]");
@@ -345,7 +349,7 @@ const AnnotatorInput = (props) => {
             createLabel({
                 title: input,
             })
-                .then(() => { })
+                .then(() => {})
                 .catch((err) => {
                     console.log(err);
                 });
@@ -451,7 +455,13 @@ const AnnotatorInput = (props) => {
 
         setLocalItems(newItems);
 
-        document.getElementById(`data-annotate-id-${id}`).remove();
+        // delete bounding box if it was shown
+        if (showBoundingBox) {
+            const titleEl = document.getElementById(`data-annotate-id-${id}`);
+            if (titleEl) {
+                titleEl.remove();
+            }
+        }
 
         if (onDelete) {
             onDelete();

@@ -84,7 +84,7 @@ const handleShadowElementClick = (target) => {
 }
 
 const renderLabel = (target, annotatorInputprops = {}) => {
-    const { onInputSubmit, onInputCancel, onDelete, showAnnotateSimilar } = annotatorInputprops;
+    const { onInputSubmit, onInputCancel, onDelete, showAnnotateSimilar, showBoundingBox } = annotatorInputprops;
 
     if (!target) return;
 
@@ -105,6 +105,7 @@ const renderLabel = (target, annotatorInputprops = {}) => {
         onInputCancel={onInputCancel}
         onDelete={onDelete}
         showAnnotateSimilar={showAnnotateSimilar}
+        showBoundingBox={showBoundingBox}
     />, annotatorInput);
 
     let app_container = document.getElementById("annotator-app-container");
@@ -153,6 +154,7 @@ const renderLabel = (target, annotatorInputprops = {}) => {
 export const removeAnnotatorInput = () => {
     localStorage.removeItem("annotating");
     window.addEventListener("pointerover", handleElementPointerOver, true);
+    // BUG This gets called 
     document.getElementById("annotator-input").remove();
 };
 
