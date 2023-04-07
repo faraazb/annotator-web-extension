@@ -4,7 +4,7 @@ import { usePopper } from "react-popper";
 import toast from "react-hot-toast";
 import useScreenshot from "../../hooks/use-screenshot";
 import { exitInspectorMode, startInspectorMode } from "../../lib/annotate";
-import { useStore } from "../../store";
+import { TOOLS, useStore } from "../../store";
 import { blobToDataURL } from "../../utils/blob";
 import { Camera, Download, DragHandle, RectangleTool, SendPlane, Spline } from "../icons";
 // import "./tools.css";
@@ -56,8 +56,10 @@ const Tools = () => {
         // disable pointer events to prevent hover styles
         document.body.style.pointerEvents = "none";
 
-        // stop element inspector
-        exitInspectorMode();
+        if (selectedTool === TOOLS.ELEMENT_PICKER) {
+            // stop element inspector
+            exitInspectorMode();
+        }
 
         // hide tools menu
         setOpen(false);
@@ -82,7 +84,7 @@ const Tools = () => {
     };
 
     useEffect(() => {
-        if (screenshot) {
+        if (screenshot && selectedTool === TOOLS.ELEMENT_PICKER) {
             startInspectorMode();
         }
         (async function () {
