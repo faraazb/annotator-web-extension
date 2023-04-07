@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "preact/hooks";
 import Konva from "konva";
-import { getStore, tools, useStore } from "../../store";
+import { getStore, TOOLS, useStore } from "../../store";
 import { render } from "preact";
 import { exitInspectorMode, renderLabel, startInspectorMode } from "../../lib/annotate";
 // import Combobox, { LabelCombobox } from "../combobox";
@@ -34,7 +34,7 @@ const Board = () => {
         // console.log("Tool changed");
         toolId = selectedTool;
         const markerrBoardContainer = document.getElementById("annotator-board-container");
-        if (selectedTool === tools.ELEMENT_PICKER) {
+        if (selectedTool === TOOLS.ELEMENT_PICKER) {
             // disable pointer events on canvas container
             if (markerrBoardContainer) {
                 markerrBoardContainer.style.pointerEvents = "none";
@@ -264,7 +264,7 @@ const initCanvas = () => {
         // show annotator input when the ghost div is clicked
         // also pass functions to make changes to the canvas element
         rectDOMTarget.addEventListener("click", () => {
-            if (toolId === tools.RECTANGLE) {
+            if (toolId === TOOLS.RECTANGLE) {
                 renderLabel(rectDOMTarget, {
                     onInputSubmit: () => {
                         // titlePopperInstance = popperInstance;

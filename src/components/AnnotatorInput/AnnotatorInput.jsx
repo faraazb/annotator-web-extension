@@ -273,7 +273,6 @@ const AnnotatorInput = (props) => {
             });
 
             if (showBoundingBox) {
-                console.log("Showing boudnign box");
                 let element_overlay = new Overlay({
                     disableTip: true,
                     id: `data-annotate-id-${id}`,

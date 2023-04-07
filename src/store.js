@@ -1,6 +1,6 @@
 import createStore from "teaful";
 
-export const tools = {
+export const TOOLS = {
     SELECT: 1,
     RECTANGLE: 2,
     ELEMENT_PICKER: 3
@@ -12,7 +12,7 @@ export const tools = {
 
 const initialStore = {
     user: null,
-    selectedTool: tools.ELEMENT_PICKER,
+    selectedTool: TOOLS.ELEMENT_PICKER,
     toolsOpen: true,
     leaderboard: [],
     annotations: [],
