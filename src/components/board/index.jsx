@@ -115,13 +115,13 @@ const initCanvas = () => {
     //     scrollAdjustNodes.forEach((node) => {
     //         const { x, y, top, left } = node.element.getBoundingClientRect();
     //         const { height } =
-    //             node.markerrNodeLabelContainer.getBoundingClientRect();
+    //             node.DOMTarget.getBoundingClientRect();
     //         // console.log(y + window.scrollY);
     //         node.position({ x: x, y: y + window.scrollY });
-    //         node.markerrNodeLabelContainer.style.top = `${top - height - 5}px`;
+    //         node.DOMTarget.style.top = `${top - height - 5}px`;
     //         // maybe apply the position related propeties of the
     //         // parent node that was sticky or fixed
-    //         node.markerrNodeLabelContainer.style.position = "fixed";
+    //         node.DOMTarget.style.position = "fixed";
 
     //         if (node.markerrSelectSimilarButton) {
     //         }
@@ -147,11 +147,14 @@ const initCanvas = () => {
     //     strokeWidth: 1,
     //     visible: false,
     // });
-    // layer.add(selectionRectangle);
+    // layer.add(selectionRectangle);]
+
     const destroyShape = (shape) => {
-        // removeAnnotatorInputIfPresent();
-        if (shape.markerrNodeLabelContainer) {
-            shape.markerrNodeLabelContainer.remove();
+        if (shape.DOMTarget) {
+            shape.DOMTarget.remove();
+        }
+        if (shape.titlePopperInstance) {
+            shape.titlePopperInstance.forceUpdate();
         }
         shape.destroy();
     };
@@ -160,13 +163,10 @@ const initCanvas = () => {
     stageContainer.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" || e.key === "Delete") {
             e.preventDefault();
+            // removing is important when deleting using keyboard
+            // as it is not called by the AnnotatorInput
+            removeAnnotatorInputIfPresent();
             selectedShapes.forEach((shape) => {
-                // if (shape.node) {
-                //     shape.node.dataset.markerr = "deleted";
-                // }
-                // if (shape.markerrSelectSimilarButton) {
-                //     shape.markerrSelectSimilarButton.remove();
-                // }
                 destroyShape(shape);
             });
             selectShapes([]);
@@ -259,6 +259,8 @@ const initCanvas = () => {
                 z-index: 999999x;`,
         });
 
+        // store title element's popper instance obtained as AnnotatorInput's handleSubmit
+        // callback argument
         let titlePopperInstance;
 
         // show annotator input when the ghost div is clicked
@@ -266,7 +268,8 @@ const initCanvas = () => {
         rectDOMTarget.addEventListener("click", () => {
             if (toolId === TOOLS.RECTANGLE) {
                 renderLabel(rectDOMTarget, {
-                    onInputSubmit: () => {
+                    onInputSubmit: (popperInstance) => {
+                        newRect.titlePopperInstance = popperInstance;
                         // titlePopperInstance = popperInstance;
                         // newRect.destroy();
                     },
@@ -285,7 +288,7 @@ const initCanvas = () => {
                 });
             }
         });
-        newRect.markerrNodeLabelContainer = rectDOMTarget;
+        newRect.DOMTarget = rectDOMTarget;
 
         newRect.on("click", (_event) => {
             rectDOMTarget.click();
@@ -295,8 +298,7 @@ const initCanvas = () => {
             removeAnnotatorInputIfPresent();
         });
 
-        newRect.on("transformend", (_event) => {
-            // newRect.y() + (newRect.height() * newRect.scaleY()) + 5
+        newRect.on("transform", (_event) => {
             rectDOMTarget.style.top = `${newRect.y()}px`;
             rectDOMTarget.style.left = `${newRect.x()}px`;
             rectDOMTarget.style.height = `${(newRect.height() * newRect.scaleY()).toString()}px`;
@@ -306,16 +308,9 @@ const initCanvas = () => {
             if (titleEl) {
                 titleEl.style.width = `${(newRect.width() * newRect.scaleX()).toString()}px`;
             }
-
-            // // disable select similar button when el annotation is moved
-            // if (newRect.markerrSelectSimilarButton) {
-            //     newRect.markerrSelectSimilarButton.remove();
-            //     newRect.markerrSelectSimilarButton = undefined;
-            // }
-
-            // if (newRect.element) {
-            //     newRect.element.dataset.markerr = "moved";
-            // }
+            if (newRect.titlePopperInstance) {
+                newRect.titlePopperInstance.forceUpdate();
+            }
         });
 
         newRect.on("dragstart", (_event) => {
@@ -323,16 +318,11 @@ const initCanvas = () => {
         });
 
         newRect.on("dragmove", (_event) => {
-            // const { x, y } = newRect.getAbsolutePosition();
-            // const titleElementPopper = rectDOMTarget.getAttribute("data-annotate-id");
-            // if (titleElementPopper) {
-
-            // }
             rectDOMTarget.style.top = `${newRect.y()}px`;
             rectDOMTarget.style.left = `${newRect.x()}px`;
-            // if (titlePopperInstance) {
-            //     titlePopperInstance.forceUpdate();
-            // }
+            if (newRect.titlePopperInstance) {
+                newRect.titlePopperInstance.forceUpdate();
+            }
             // rectDOMTarget.style.backgroundColor = "red";
 
             // disable select similar button when el annotation is moved
@@ -348,12 +338,13 @@ const initCanvas = () => {
 
         //
         renderLabel(rectDOMTarget, {
-            onInputSubmit: () => {
+            onInputSubmit: (popperInstance) => {
                 draftRectangle.visible(false);
                 draftRectangle.height(0);
                 draftRectangle.width(0);
                 layer.add(newRect);
                 // titlePopperInstance = popperInstance;
+                newRect.titlePopperInstance = popperInstance;
                 // newRect.destroy();
             },
             onInputCancel: (inputValue) => {
@@ -368,7 +359,7 @@ const initCanvas = () => {
                 // hide transformer handles
                 selectShapes([]);
                 // remove canvas and DOM target
-                destroyShape(newRect)
+                destroyShape(newRect);
             },
             showAnnotateSimilar: false,
             showBoundingBox: false,
