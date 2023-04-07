@@ -1,4 +1,4 @@
-import {  useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import { render } from "preact";
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
@@ -36,8 +36,6 @@ function getLabelsFilter(inputValue) {
 }
 
 function detectCollision(element1, element2) {
-    console.log(element1.getBoundingClientRect());
-    console.log(element2.getBoundingClientRect());
     const { top: top1, right: right1, bottom: bottom1, left: left1 } = element1.getBoundingClientRect();
     const { top: top2, right: right2, bottom: bottom2, left: left2 } = element2.getBoundingClientRect();
 
@@ -156,8 +154,18 @@ const AnnotatorInput = (props) => {
             "Testimonials",
             "Logo Cloud",
         ];
-        return possible_items.map((item) => ({ title: item, value: [] }));
+
+        let result = [];
+
+        if (localStorage.getItem("items")) {
+            result = JSON.parse(localStorage.getItem("items"));
+        } else {
+            result = possible_items.map((item) => ({ title: item, value: [] }));
+        }
+
+        return result;
     });
+
     const [loading, setLoading] = useState(false);
     const [canDelete] = useState(() => Boolean(element.getAttribute("data-annotate-id")));
 
@@ -181,7 +189,6 @@ const AnnotatorInput = (props) => {
         let similar_elements = [];
         if (checked_signal.value) {
             similar_elements = findSimilarElements(element);
-            console.log("similar elements are", similar_elements);
         }
 
         similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate-id"));
@@ -295,7 +302,7 @@ const AnnotatorInput = (props) => {
 
                     if (collided) {
                         if (item.contains(ele)) {
-                            console.log("I am inside");
+                            //
                         } else {
                             while (collided) {
                                 let current_placement_index = placement_sequence.indexOf(placement);
