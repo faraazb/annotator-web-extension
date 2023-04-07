@@ -63,7 +63,7 @@ function generateUUID() {
 
 function getLabelsFilter(inputValue) {
     const lowerCasedInputValue = inputValue.toLowerCase();
-    return function ({ title }) {
+    return function({ title }) {
         return !inputValue || title.toLowerCase().includes(lowerCasedInputValue);
     };
 }
@@ -197,13 +197,14 @@ const AnnotatorInput = (props) => {
         let similar_elements = [];
         if (checked_signal.value) {
             similar_elements = findSimilarElements(element);
+            console.log("similar elements are", similar_elements);
         }
 
         similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate-id"));
 
         let all_elements = [element, ...similar_elements];
         let xys = [];
-        
+
         // store popper instance to send it to the canvas listeners
         // similar elements is disabled for rectangle tool
         // so only the first ele's popper_instance is required
@@ -310,7 +311,7 @@ const AnnotatorInput = (props) => {
 
                     if (collided) {
                         if (item.contains(ele)) {
-                            console.log(" iam inside bro");
+                            console.log("I am inside");
                         } else {
                             while (collided) {
                                 let current_placement_index = placement_sequence.indexOf(placement);
@@ -353,14 +354,6 @@ const AnnotatorInput = (props) => {
                     value: [...xys],
                 },
             ]);
-
-            createLabel({
-                title: input,
-            })
-                .then(() => {})
-                .catch((err) => {
-                    console.log(err);
-                });
         }
 
         if (onInputSubmit) {
@@ -494,7 +487,7 @@ const AnnotatorInput = (props) => {
                     defaultSelectedItemTitle={element.getAttribute("data-annotate-title") || null}
                     items={items}
                     setItems={setItems}
-                    setSelectedItem={() => {}}
+                    setSelectedItem={() => { }}
                     getFilter={getLabelsFilter}
                 />
                 <div className="annotator_input_btns_container">

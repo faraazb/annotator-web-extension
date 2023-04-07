@@ -74,14 +74,14 @@ const handleElementClick = (e) => {
         return;
     }
     renderLabel(target);
-}
+};
 
 const handleShadowElementClick = (target) => {
     if (!(target instanceof HTMLElement)) {
         return;
     }
     renderLabel(target);
-}
+};
 
 const renderLabel = (target, annotatorInputprops = {}) => {
     const { onInputSubmit, onInputCancel, onDelete, showAnnotateSimilar, showBoundingBox } = annotatorInputprops;
@@ -99,14 +99,18 @@ const renderLabel = (target, annotatorInputprops = {}) => {
 
     let annotatorInput = document.createElement("div");
     annotatorInput.id = "annotator-input";
-    render(<AnnotatorInput
-        element={target}
-        onInputSubmit={onInputSubmit}
-        onInputCancel={onInputCancel}
-        onDelete={onDelete}
-        showAnnotateSimilar={showAnnotateSimilar}
-        showBoundingBox={showBoundingBox}
-    />, annotatorInput);
+
+    render(
+        <AnnotatorInput
+            element={target}
+            onInputSubmit={onInputSubmit}
+            onInputCancel={onInputCancel}
+            onDelete={onDelete}
+            showAnnotateSimilar={showAnnotateSimilar}
+            showBoundingBox={showBoundingBox}
+        />,
+        annotatorInput
+    );
 
     let app_container = document.getElementById("annotator-app-container");
     app_container.appendChild(annotatorInput);
@@ -121,68 +125,58 @@ const renderLabel = (target, annotatorInputprops = {}) => {
                 options: {
                     offset: ({ placement }) => {
                         if (placement === "top") {
-                            return [0, -paddingTop + 16]
+                            return [0, -paddingTop + 16];
                         }
                         if (placement === "bottom") {
-                            return [0, -paddingBottom + 16]
-                        }
-                        else {
+                            return [0, -paddingBottom + 16];
+                        } else {
                             return [0, 16];
                         }
                     },
-                }
+                },
             },
             {
                 name: "flip",
                 options: {
                     fallbackPlacements: ["left", "right"],
-                }
-            }
-        ]
+                },
+            },
+        ],
     });
 
     if (!localStorage.getItem("annotating")) {
         localStorage.setItem("annotating", "true");
-        window.removeEventListener(
-            "pointerover",
-            handleElementPointerOver,
-            true
-        );
+        window.removeEventListener("pointerover", handleElementPointerOver, true);
     }
 };
 
 export const removeAnnotatorInput = () => {
     localStorage.removeItem("annotating");
     window.addEventListener("pointerover", handleElementPointerOver, true);
-    // BUG This gets called 
+    // BUG This gets called
     document.getElementById("annotator-input").remove();
 };
 
-const handleEscape = (e) => {
-    if (e.key?.toLowerCase() === "escape") {
-        e.preventDefault();
-        removeAnnotatorInput();
-        exitInspectorMode();
-    }
-};
-
-window.addEventListener("keydown", handleEscape);
+// const handleEscape = (e) => {
+//     if (e.key?.toLowerCase() === "escape") {
+//         e.preventDefault();
+//         removeAnnotatorInput();
+//         exitInspectorMode();
+//     }
+// };
+//
+// window.addEventListener("keydown", handleEscape);
 
 window.addEventListener("mousemove", (e) => {
     mousePos.x = e.clientX;
     mousePos.y = e.clientY;
 });
 
-window.addEventListener("beforeunload", function () {
+window.addEventListener("beforeunload", function() {
     this.localStorage.removeItem("annotating");
 });
-window.addEventListener("beforeunload", function () {
+window.addEventListener("beforeunload", function() {
     this.localStorage.removeItem("annotating");
 });
 
-export {
-    handleElementPointerOver,
-    handleElementClick,
-    handleShadowElementClick,
-    renderLabel,
-}
+export { handleElementPointerOver, handleElementClick, handleShadowElementClick, renderLabel };
