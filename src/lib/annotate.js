@@ -174,9 +174,7 @@ window.addEventListener("mousemove", (e) => {
 
 window.addEventListener("beforeunload", function() {
     this.localStorage.removeItem("annotating");
-});
-window.addEventListener("beforeunload", function() {
-    this.localStorage.removeItem("annotating");
+    this.localStorage.removeItem("items")
 });
 
 export { handleElementPointerOver, handleElementClick, handleShadowElementClick, renderLabel };

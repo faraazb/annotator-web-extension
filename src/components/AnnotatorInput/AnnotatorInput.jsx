@@ -22,7 +22,6 @@ function is_element_or_its_parents_fixed_or_sticky(node) {
 }
 
 function check(el1, el2) {
-    console.log("a");
     let rect1 = el1.getBoundingClientRect();
     let rect2 = el2.getBoundingClientRect();
 
