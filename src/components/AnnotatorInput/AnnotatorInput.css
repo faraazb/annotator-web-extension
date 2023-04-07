@@ -1,24 +1,14 @@
 .stroke-single {
     all: unset !important;
     position: relative !important;
-    background: transparent !important;
     z-index: 0 !important;
     color: red !important;
 }
 
-.stroke-single:before {
-    content: attr(title) !important;
-    position: absolute !important;
-    -webkit-text-stroke: 0.185em #fff !important;
-    left: 0 !important;
-    z-index: -1 !important;
-    text-shadow: 0px -2px 4px #000, 0px 2px 4px #000 !important;
-}
-
 .annotator_input_container {
     background: white;
-    box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,
-        rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+    box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px,
+        rgba(15, 15, 15, 0.2) 0px 9px 24px;
     padding: 16px;
     border-radius: 8px;
 }

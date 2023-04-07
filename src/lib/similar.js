@@ -5,7 +5,7 @@ export function isEqual(a, b) {
         return a === b;
     }
 
-    if (typeof a !== 'object' || typeof b !== 'object') {
+    if (typeof a !== "object" || typeof b !== "object") {
         return a === b;
     }
 
@@ -43,8 +43,8 @@ export function isEqual(a, b) {
 }
 
 function detectDataType(data) {
-    if (Array.isArray(data)) return 'array';
-    return 'object';
+    if (Array.isArray(data)) return "array";
+    return "object";
 }
 
 function cache(a, b, cached) {
@@ -61,16 +61,15 @@ function cache(a, b, cached) {
     setForB.add(a);
 }
 
-
 function generateHTMLStructure(element) {
     let tagName = element.tagName.toLowerCase();
     let children = Array.from(element.children);
     let obj = {};
     if (children.length > 0) {
         obj[tagName] = {};
-        children.forEach(child => {
+        children.forEach((child) => {
             let childObj = generateHTMLStructure(child);
-            Object.keys(childObj).forEach(key => {
+            Object.keys(childObj).forEach((key) => {
                 if (!obj[tagName][key]) {
                     obj[tagName][key] = childObj[key];
                 } else if (Array.isArray(obj[tagName][key])) {
@@ -86,7 +85,19 @@ function generateHTMLStructure(element) {
     return obj;
 }
 
-export function findSimilarElements(element, levels = 10) {
+export function findSimilarElements(element) {
+    let className = element.getAttribute("class");
+
+    if (className.trim() === "") {
+        return [];
+    }
+
+    let same_structure_elements = document.getElementsByClassName(className);
+
+    return [...same_structure_elements];
+}
+
+export function findSimilarElementsLegacy(element, levels = 10) {
     let current_element = element;
     let same_structure_elements = [];
 
@@ -95,15 +106,14 @@ export function findSimilarElements(element, levels = 10) {
     }
 
     function ignoreElement(element) {
-        let ignored_tags = ["script", "style", "link", "html", "body", "head"]
+        let ignored_tags = ["script", "style", "link", "html", "body", "head"];
 
         if (ignored_tags.includes(element.tagName.toLowerCase())) {
-            return true
+            return true;
         }
 
         return false;
     }
-
 
     for (let level = 0; level < levels; level++) {
         let temp_next_element = current_element;
@@ -127,7 +137,6 @@ export function findSimilarElements(element, levels = 10) {
             temp_next_element = next_element;
         }
 
-
         while (temp_prev_element.previousElementSibling) {
             let prev_element = temp_prev_element.previousElementSibling;
 
@@ -146,7 +155,6 @@ export function findSimilarElements(element, levels = 10) {
             temp_prev_element = prev_element;
         }
 
-
         if (same_structure_elements.length > 0) {
             break; // exit loop if matching elements are found
         } else if (temp_next_element.parentElement) {
@@ -155,7 +163,6 @@ export function findSimilarElements(element, levels = 10) {
             break; // exit loop if no more levels to check
         }
     }
-
 
     return same_structure_elements;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import {  useState } from "preact/hooks";
 import { render } from "preact";
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
@@ -7,8 +7,7 @@ import { signal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
-import { computeStyles, createPopper, Placement } from "@popperjs/core";
-import { createLabel, getLabels } from "../../api";
+import { createPopper, Placement } from "@popperjs/core";
 
 function is_element_or_its_parents_fixed_or_sticky(node) {
     while (node && node instanceof Element && node.nodeName.toLowerCase() !== "body") {
@@ -19,38 +18,6 @@ function is_element_or_its_parents_fixed_or_sticky(node) {
         node = node.parentNode;
     }
     return null;
-}
-
-function check(el1, el2) {
-    console.log("a");
-    let rect1 = el1.getBoundingClientRect();
-    let rect2 = el2.getBoundingClientRect();
-
-    if (el1.contains(el2)) {
-        if (
-            rect1.left <= rect2.left &&
-            rect1.right >= rect2.right &&
-            rect1.top <= rect2.top &&
-            rect1.bottom >= rect2.bottom
-        ) {
-            return "Element 2 is inside Element 1 and colliding";
-        } else {
-            return "Element 2 is inside Element 1";
-        }
-    } else if (el2.contains(el1)) {
-        if (
-            rect2.left <= rect1.left &&
-            rect2.right >= rect1.right &&
-            rect2.top <= rect1.top &&
-            rect2.bottom >= rect1.bottom
-        ) {
-            return "Element 1 is inside Element 2 and colliding";
-        } else {
-            return "Element 1 is inside Element 2";
-        }
-    } else {
-        return "Elements are not inside each other";
-    }
 }
 
 // Generate a UUID using the built-in crypto API
@@ -75,23 +42,6 @@ function detectCollision(element1, element2) {
     const { top: top2, right: right2, bottom: bottom2, left: left2 } = element2.getBoundingClientRect();
 
     return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
-}
-
-function crossesBorder(el1, el2) {
-    const el1Rect = el1.getBoundingClientRect(); // Get the bounding rectangle of el1
-    const el2Rect = el2.getBoundingClientRect(); // Get the bounding rectangle of el2
-
-    // Check if any of the borders of el1 crosses the borders of el2
-    if (
-        el1Rect.top < el2Rect.top ||
-        el1Rect.right > el2Rect.right ||
-        el1Rect.bottom > el2Rect.bottom ||
-        el1Rect.left < el2Rect.left
-    ) {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 const checked_signal = signal(false);
@@ -166,16 +116,50 @@ const AnnotatorInput = (props) => {
     } = props;
     // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
     /** @type [{title: string, value: {x: string, y: string, id: string}[]}[], any]*/
-    const [items, setItems] = useState(JSON.parse(localStorage.getItem("items")) || []);
+    const [items, setItems] = useState(() => {
+        let possible_items = [
+            "Section",
+            "Container",
+            "Image",
+            "GlyphIcon ",
+            "Anchor/Link",
+            "Button",
+            "Social",
+            "Heading",
+            "Title",
+            "Description",
+            "Rich Description",
+            "Hero Banner",
+            "Carousel",
+            "Cards",
+            "Footer",
+            "Header",
+            "Menu",
+            "Navigation",
+            "Banner",
+            "Customers List",
+            "Partner List",
+            "Section",
+            "Container",
+            "Footer Links",
+            "Text",
+            "Featured Section",
+            "Picture Gallery",
+            "Value Section",
+            "Contact Us",
+            "Pricing",
+            "FAQ",
+            "Breadcrumbs",
+            "Tabs",
+            "Pagination",
+            "News letter",
+            "Testimonials",
+            "Logo Cloud",
+        ];
+        return possible_items.map((item) => ({ title: item, value: [] }));
+    });
     const [loading, setLoading] = useState(false);
-
     const [canDelete] = useState(() => Boolean(element.getAttribute("data-annotate-id")));
-
-    useEffect(() => {
-        (async () => {
-            let res = await getLabels();
-        })();
-    }, []);
 
     let setLocalItems = (items) => {
         setItems(items);
@@ -197,13 +181,14 @@ const AnnotatorInput = (props) => {
         let similar_elements = [];
         if (checked_signal.value) {
             similar_elements = findSimilarElements(element);
+            console.log("similar elements are", similar_elements);
         }
 
         similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate-id"));
 
         let all_elements = [element, ...similar_elements];
         let xys = [];
-        
+
         // store popper instance to send it to the canvas listeners
         // similar elements is disabled for rectangle tool
         // so only the first ele's popper_instance is required
@@ -242,7 +227,7 @@ const AnnotatorInput = (props) => {
 
             let paddingTop = parseInt(window.getComputedStyle(ele).paddingTop, 10) || 0;
             let paddingLeft = parseInt(window.getComputedStyle(ele).paddingLeft, 10) || 0;
-            let paddingBottom = parseInt(window.getComputedStyle(ele).paddingBottom, 10) || 0;
+            // let paddingBottom = parseInt(window.getComputedStyle(ele).paddingBottom, 10) || 0;
 
             render(
                 <p className="stroke-single" title={input}>
@@ -310,7 +295,7 @@ const AnnotatorInput = (props) => {
 
                     if (collided) {
                         if (item.contains(ele)) {
-                            console.log(" iam inside bro");
+                            console.log("I am inside");
                         } else {
                             while (collided) {
                                 let current_placement_index = placement_sequence.indexOf(placement);
@@ -353,14 +338,6 @@ const AnnotatorInput = (props) => {
                     value: [...xys],
                 },
             ]);
-
-            createLabel({
-                title: input,
-            })
-                .then(() => {})
-                .catch((err) => {
-                    console.log(err);
-                });
         }
 
         if (onInputSubmit) {
