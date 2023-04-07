@@ -3,7 +3,7 @@ const config = {
     "implicitGrantUrl": "https://accounts.google.com/o/oauth2/auth",
     "logoutUrl": "https://accounts.google.com/logout",
     "tokenInfoUrl": "https://www.googleapis.com/oauth2/v3/tokeninfo",
-    "clientId": "408016905439-t2ooip6mmu6f7p18301nor6r8hgp8p6b.apps.googleusercontent.com",
+    "clientId": process.env.OAUTH_GOOGLE_CLIENTID,
     "scopes": "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
 };
 

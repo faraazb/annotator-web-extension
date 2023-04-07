@@ -1,5 +1,3 @@
-import { convertFileSize } from "./utils/blob";
-
 class API {
     constructor({ baseUrl, options }) {
         this.baseUrl = baseUrl || "";
@@ -38,8 +36,7 @@ class API {
 }
 
 const api = new API({
-    baseUrl: "https://data-science-theta.vercel.app/api",
-    // baseUrl: "http://localhost:3000/api",
+    baseUrl: process.env.API_URL,
     options: {
         headers: {
             "Content-type": "application/json"
