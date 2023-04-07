@@ -11,9 +11,9 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener(
-    async (_info, _tab) => {
+    async (_info, tab) => {
         // info will have information about the cm clicked
-        // const response = await chrome.tabs.sendMessage(tab.id, { action: "INIT" });
+        await chrome.tabs.sendMessage(tab.id, { action: "START_ANNOTATOR" });
         // console.log(response)
     }
 );

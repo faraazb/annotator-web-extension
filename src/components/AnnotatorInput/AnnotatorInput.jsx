@@ -203,8 +203,13 @@ const AnnotatorInput = (props) => {
 
         let all_elements = [element, ...similar_elements];
         let xys = [];
+        
+        // store popper instance to send it to the canvas listeners
+        // similar elements is disabled for rectangle tool
+        // so only the first ele's popper_instance is required
+        let popperInstance;
 
-        all_elements.forEach(async (ele) => {
+        all_elements.forEach(async (ele, index) => {
             if (ele.getAttribute("data-annotate-id") === input) {
                 return;
             }
@@ -271,6 +276,10 @@ const AnnotatorInput = (props) => {
                 ],
                 strategy: "absolute",
             });
+
+            if (index === 0) {
+                popperInstance = popper_instance;
+            }
 
             if (showBoundingBox) {
                 let element_overlay = new Overlay({
@@ -355,7 +364,7 @@ const AnnotatorInput = (props) => {
         }
 
         if (onInputSubmit) {
-            onInputSubmit();
+            onInputSubmit(popperInstance);
         }
 
         removeAnnotatorInput();
