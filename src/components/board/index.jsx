@@ -72,10 +72,10 @@ const removeAnnotatorInputIfPresent = () => {
 const initCanvas = () => {
     // const [labels, setLabels] = getStore.labels();
     // const [toolId] = getStore.selectedTool();
-    const [tool, setTool] = getStore.selectedTool();
-    const scrollAdjustNodes = [];
+    // const [tool, setTool] = getStore.selectedTool();
+    // const scrollAdjustNodes = [];
 
-    const markerrBoardContainer = document.getElementById("annotator-board-container");
+    // const markerrBoardContainer = document.getElementById("annotator-board-container");
 
     const body = document.body;
     const html = document.documentElement;
@@ -160,24 +160,24 @@ const initCanvas = () => {
     };
 
     // keyboard events - delete
-    stageContainer.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" || e.key === "Delete") {
-            e.preventDefault();
-            // removing is important when deleting using keyboard
-            // as it is not called by the AnnotatorInput
-            removeAnnotatorInputIfPresent();
-            selectedShapes.forEach((shape) => {
-                destroyShape(shape);
-            });
-            selectShapes([]);
-        } else if (e.key === "v") {
-            setTool(1);
-        } else if (e.key === "r") {
-            setTool(2);
-        } else if (e.key === "p") {
-            setTool(3);
-        }
-    });
+    // stageContainer.addEventListener("keydown", (e) => {
+    //     if (e.key === "Backspace" || e.key === "Delete") {
+    //         e.preventDefault();
+    //         // removing is important when deleting using keyboard
+    //         // as it is not called by the AnnotatorInput
+    //         removeAnnotatorInputIfPresent();
+    //         selectedShapes.forEach((shape) => {
+    //             destroyShape(shape);
+    //         });
+    //         selectShapes([]);
+    //     } else if (e.key === "v") {
+    //         setTool(1);
+    //     } else if (e.key === "r") {
+    //         setTool(2);
+    //     } else if (e.key === "p") {
+    //         setTool(3);
+    //     }
+    // });
 
     stage.draw();
 
@@ -299,14 +299,19 @@ const initCanvas = () => {
         });
 
         newRect.on("transform", (_event) => {
+            const annotationId = rectDOMTarget.getAttribute("data-annotate-id");
+            const annotationTitle = rectDOMTarget.getAttribute("data-annotate-title");
+
+            const nextHeight = newRect.height() * newRect.scaleY();
+            const nextWidth = newRect.width() * newRect.scaleX();
+
             rectDOMTarget.style.top = `${newRect.y()}px`;
             rectDOMTarget.style.left = `${newRect.x()}px`;
-            rectDOMTarget.style.height = `${(newRect.height() * newRect.scaleY()).toString()}px`;
-            rectDOMTarget.style.width = `${(newRect.width() * newRect.scaleX()).toString()}px`;
-            const titleElId = rectDOMTarget.getAttribute("data-annotate-id");
-            const titleEl = document.getElementById(titleElId);
+            rectDOMTarget.style.height = `${nextHeight.toString()}px`;
+            rectDOMTarget.style.width = `${nextWidth.toString()}px`;
+            const titleEl = document.getElementById(annotationId);
             if (titleEl) {
-                titleEl.style.width = `${(newRect.width() * newRect.scaleX()).toString()}px`;
+                titleEl.style.width = `${nextWidth.toString()}px`;
             }
             if (newRect.titlePopperInstance) {
                 newRect.titlePopperInstance.forceUpdate();
@@ -334,6 +339,26 @@ const initCanvas = () => {
             // if (newRect.element) {
             //     newRect.element.dataset.markerr = "moved";
             // }
+        });
+
+        newRect.on("transformend dragend", (_event) => {
+            const annotationId = rectDOMTarget.getAttribute("data-annotate-id");
+            const annotationTitle = rectDOMTarget.getAttribute("data-annotate-title");
+
+            let items = JSON.parse(localStorage.getItem("items"));
+            let titleGroup = items.findIndex(({ title }) => title === annotationTitle);
+            const annotationIndex =
+                titleGroup > -1 ? items[titleGroup].value.findIndex(({ id }) => id === annotationId) : -1;
+
+            if (annotationIndex > -1) {
+                const rectDOMBounding = rectDOMTarget.getBoundingClientRect();
+                let x = rectDOMBounding.x + window.scrollX;
+                let y = rectDOMBounding.y + window.scrollY;
+                let width = rectDOMBounding.width;
+                let height = rectDOMBounding.height;
+                items[titleGroup].value[annotationIndex] = { id: annotationId, x, y, width, height };
+                localStorage.setItem("items", JSON.stringify(items));
+            }
         });
 
         //
