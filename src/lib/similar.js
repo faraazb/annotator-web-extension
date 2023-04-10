@@ -86,10 +86,26 @@ function generateHTMLStructure(element) {
 }
 
 export function findSimilarElements(element) {
-    let className = element.getAttribute("class");
+    let className = element.getAttribute("class") || "";
 
     if (className.trim() === "") {
-        return [];
+        if (element.children.length === 0) {
+            let parent_similar_elements = findSimilarElementsLegacy(element, 10, true);
+            let to_return = [];
+            let current_element_structure = generateHTMLStructure(element);
+
+            if (parent_similar_elements.length > 0) {
+                parent_similar_elements.forEach((parent_element) => {
+                    let res = find_element_with_structure(parent_element, current_element_structure);
+                    if (res) {
+                        to_return.push(res);
+                    }
+                });
+            }
+            return to_return;
+        } else {
+            return [];
+        }
     }
 
     let same_structure_elements = document.getElementsByClassName(className);
@@ -97,22 +113,35 @@ export function findSimilarElements(element) {
     return [...same_structure_elements];
 }
 
-export function findSimilarElementsLegacy(element, levels = 10) {
+export function find_element_with_structure(element, structure) {
+    let children = Array.from(element.children);
+
+    for (let i = 0; i < children.length; i++) {
+        let child = children[i];
+
+        // last child
+        if (child.children.length === 0) {
+            if (child.tagName.toLowerCase() === Object.keys(structure)[0]) {
+                return child;
+            } else {
+                return null;
+            }
+        } else {
+            let res = find_element_with_structure(child, structure);
+            if (res) {
+                return res;
+            }
+        }
+    }
+
+}
+
+export function findSimilarElementsLegacy(element, levels = 10, single_elements_search = false) {
     let current_element = element;
     let same_structure_elements = [];
 
-    if (element.children.length === 0) {
+    if (!single_elements_search && element.children.length === 0) {
         return same_structure_elements;
-    }
-
-    function ignoreElement(element) {
-        let ignored_tags = ["script", "style", "link", "html", "body", "head"];
-
-        if (ignored_tags.includes(element.tagName.toLowerCase())) {
-            return true;
-        }
-
-        return false;
     }
 
     for (let level = 0; level < levels; level++) {
@@ -165,4 +194,14 @@ export function findSimilarElementsLegacy(element, levels = 10) {
     }
 
     return same_structure_elements;
+}
+
+function ignoreElement(element) {
+    let ignored_tags = ["script", "style", "link", "html", "body", "head"];
+
+    if (ignored_tags.includes(element.tagName.toLowerCase())) {
+        return true;
+    }
+
+    return false;
 }
