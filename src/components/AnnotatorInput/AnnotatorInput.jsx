@@ -3,7 +3,7 @@ import { render } from "preact";
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
 import Overlay from "../../lib/overlay";
-import { signal } from "@preact/signals";
+import { signal, useSignal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
@@ -42,9 +42,7 @@ function detectCollision(element1, element2) {
     return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
 }
 
-const checked_signal = signal(false);
-
-const Checkbox = () => {
+const Checkbox = ({ checked_signal }) => {
     let handleClick = () => {
         checked_signal.value = !checked_signal.value;
     };
@@ -168,6 +166,7 @@ const AnnotatorInput = (props) => {
 
     const [loading, setLoading] = useState(false);
     const [canDelete] = useState(() => Boolean(element.getAttribute("data-annotate-id")));
+    const checked_signal = useSignal(false);
 
     let setLocalItems = (items) => {
         setItems(items);
@@ -192,6 +191,19 @@ const AnnotatorInput = (props) => {
         }
 
         similar_elements = similar_elements.filter((e) => !e.getAttribute("data-annotate-id"));
+        similar_elements = similar_elements.filter((e) => {
+            let styles = window.getComputedStyle(e);
+
+            if (styles.display === "none" || styles.visibility === "hidden") {
+                return false;
+            }
+
+            if (styles.width === "0px" || styles.height === "0px") {
+                return false;
+            }
+
+            return true;
+        });
 
         let all_elements = [element, ...similar_elements];
         let xys = [];
@@ -484,7 +496,7 @@ const AnnotatorInput = (props) => {
                 <div className="annotator_input_btns_container">
                     {showAnnotateSimilar && (
                         <div>
-                            <Checkbox />
+                            <Checkbox checked_signal={checked_signal} />
                         </div>
                     )}
 
