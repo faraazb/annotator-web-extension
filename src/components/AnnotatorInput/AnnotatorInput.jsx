@@ -393,6 +393,10 @@ const AnnotatorInput = (props) => {
 
         element.setAttribute("data-annotate-title", input);
         let element_xy = JSON.parse(element.getAttribute("data-annotate-value"));
+        let element_wh = {
+            width: element.getBoundingClientRect().width,
+            height: element.getBoundingClientRect().height,
+        };
 
         if (newItems.some((item) => item.title === input)) {
             let finalItems = newItems.map((item) => {
@@ -405,6 +409,7 @@ const AnnotatorInput = (props) => {
                                 id,
                                 x: element_xy.x,
                                 y: element_xy.y,
+                                ...element_wh,
                             },
                         ],
                     };
@@ -423,6 +428,7 @@ const AnnotatorInput = (props) => {
                             id,
                             x: element_xy.x,
                             y: element_xy.y,
+                            ...element_wh,
                         },
                     ],
                 },
