@@ -66,14 +66,23 @@ const handleElementPointerOver = (e) => {
     overlay.inspect([target], getInspectName(target));
 };
 
+const dummyClick = (e) => {
+    e.preventDefault();
+};
+
 const handleElementClick = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+
     const target = e.target;
     // even the tools menu gets ignored through here
     if (target.shadowRoot) {
         return;
     }
     renderLabel(target);
+
+    window.removeEventListener("click", handleElementClick, true);
+    window.addEventListener("click", dummyClick, true);
 };
 
 const handleShadowElementClick = (target) => {
@@ -153,6 +162,8 @@ const renderLabel = (target, annotatorInputprops = {}) => {
 export const removeAnnotatorInput = () => {
     localStorage.removeItem("annotating");
     window.addEventListener("pointerover", handleElementPointerOver, true);
+    window.removeEventListener("click", dummyClick, true);
+    window.addEventListener("click", handleElementClick, true);
     // BUG This gets called
     document.getElementById("annotator-input").remove();
 };
@@ -172,9 +183,9 @@ window.addEventListener("mousemove", (e) => {
     mousePos.y = e.clientY;
 });
 
-window.addEventListener("beforeunload", function() {
+window.addEventListener("beforeunload", function () {
     this.localStorage.removeItem("annotating");
-    this.localStorage.removeItem("items")
+    this.localStorage.removeItem("items");
 });
 
 export { handleElementPointerOver, handleElementClick, handleShadowElementClick, renderLabel };

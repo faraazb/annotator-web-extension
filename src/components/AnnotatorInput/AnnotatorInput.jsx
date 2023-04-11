@@ -3,7 +3,7 @@ import { render } from "preact";
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
 import Overlay from "../../lib/overlay";
-import { signal, useSignal } from "@preact/signals";
+import { useSignal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
