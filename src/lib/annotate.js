@@ -5,6 +5,7 @@ import AnnotatorInput from "../components/AnnotatorInput/AnnotatorInput";
 import { createPopper } from "@popperjs/core";
 import { render } from "preact";
 import AnnotatorInput from "../components/AnnotatorInput/AnnotatorInput";
+import { TOOLS, getStore } from "../store";
 
 let overlay = null;
 let inspecting = false;
@@ -70,25 +71,40 @@ const dummyClick = (e) => {
     e.preventDefault();
 };
 
-const handleElementClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const target = e.target;
-    // even the tools menu gets ignored through here
-    if (target.shadowRoot) {
+const handleElementClick = (event) => {
+    event.preventDefault();
+    const target = event.target;
+    const [tool] = getStore.selectedTool();
+    const isAnnotatorUi = Boolean(target.dataset.annotatorUi);
+    // break out of this handler when certain conditions are met
+    if (isAnnotatorUi || target instanceof HTMLCanvasElement || canIgnore(target)) {
         return;
     }
-    renderLabel(target);
+    if (tool !== TOOLS.ELEMENT_PICKER) {
+        return;
+    }
+    if (target.shadowRoot) {
+        // shadow DOM elements will have their own onclicks
+        // handleShadowElementClick(e);
+        return;
+    }
 
+    // stop propagation for all inspect-able elements
+    event.stopPropagation();
+    
     window.removeEventListener("click", handleElementClick, true);
     window.addEventListener("click", dummyClick, true);
+    
+    renderLabel(target);
 };
 
-const handleShadowElementClick = (target) => {
+const handleShadowElementClick = (event) => {
+    const target = event.target;
     if (!(target instanceof HTMLElement)) {
         return;
     }
+    // The navigation event does not stop with this
+    // event.stopPropagation();
     renderLabel(target);
 };
 

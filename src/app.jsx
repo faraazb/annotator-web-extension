@@ -9,9 +9,12 @@ import {
 import Board from "./components/board";
 
 function shadowElementClick(event) {
+    // this stops button onclick's
+    // this does not stop link navigation
+    // event.stopImmediatePropagation();
     event.preventDefault();
     event.stopPropagation();
-    handleShadowElementClick(event.target);
+    handleShadowElementClick(event);
 }
 
 const prepareShadowElements = (elements) => {

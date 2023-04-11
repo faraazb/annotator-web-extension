@@ -117,7 +117,7 @@ const AnnotatorInput = (props) => {
             "Section",
             "Container",
             "Image",
-            "GlyphIcon ",
+            "GlyphIcon",
             "Anchor/Link",
             "Button",
             "Social",

@@ -74,6 +74,8 @@ const useScreenshot = () => {
                 let url = URL.createObjectURL(blob);
                 link.href = url;
                 link.download = name;
+                // needed so that handleElementClick can let it trickle down
+                link.dataset.annotatorUi = "true";
                 document.body.appendChild(link);
                 link.click();
                 setTimeout(function () {
