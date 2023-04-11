@@ -165,7 +165,6 @@ const AnnotatorInput = (props) => {
     });
 
     const [loading, setLoading] = useState(false);
-    const [canDelete] = useState(() => Boolean(element.getAttribute("data-annotate-id")));
     const checked_signal = useSignal(false);
 
     let setLocalItems = (items) => {
@@ -206,6 +205,8 @@ const AnnotatorInput = (props) => {
         });
 
         let all_elements = [element, ...similar_elements];
+        all_elements = [...new Set(all_elements)];
+
         let xys = [];
 
         // store popper instance to send it to the canvas listeners
@@ -509,7 +510,7 @@ const AnnotatorInput = (props) => {
                         }}
                     >
                         <div>
-                            {canDelete ? (
+                            {Boolean(element.getAttribute("data-annotate-id")) ? (
                                 <button
                                     onClick={handleDelete}
                                     className="checkbox_check"
