@@ -2,23 +2,6 @@ import { createAnnotation } from "./api";
 import { getUserInfo, login, logout } from "./oauth";
 import { dataURLtoFile } from "./utils/blob";
 
-// Context Menu
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({
-        id: "annotator-cm-1",
-        title: "Annotate"
-    });
-});
-
-chrome.contextMenus.onClicked.addListener(
-    async (_info, tab) => {
-        // info will have information about the cm clicked
-        await chrome.tabs.sendMessage(tab.id, { action: "START_ANNOTATOR" });
-        // console.log(response)
-    }
-);
-
-
 async function loginGoogle() {
     try {
         const token = await login();
@@ -26,9 +9,9 @@ async function loginGoogle() {
         const result = await getUserInfo(token);
         if (result) {
             await chrome.storage.local.set({ user: result });
-            return { ok: true, data: result }
+            return { ok: true, data: result };
         }
-        return { ok: false }
+        return { ok: false };
     } catch (err) {
         return { ok: false, error: err };
     }
@@ -39,14 +22,13 @@ async function logoutGoogle() {
         const result = await logout();
         if (result) {
             await chrome.storage.local.remove("user");
-            return { ok: result }
+            return { ok: result };
         }
     } catch (err) {
-        console.error(err)
+        console.error(err);
         return { ok: false, error: err };
     }
 }
-
 
 async function createTab(options) {
     const tab = await chrome.tabs.create(options);
@@ -58,10 +40,9 @@ async function queryTabs(query) {
         const tabs = await chrome.tabs.query(query);
         return { ok: true, tabs };
     } catch (err) {
-        return { ok: false, error: err.message }
+        return { ok: false, error: err.message };
     }
 }
-
 
 async function captureVisibleTab(options = { format: "png" }) {
     try {
@@ -72,9 +53,8 @@ async function captureVisibleTab(options = { format: "png" }) {
     }
 }
 
-
 /**
- * 
+ *
  * @param {string} screenshot - Data URL
  * @param {string} name - name to use for the screenshot file
  * @param {Object[]} annotations
@@ -87,9 +67,7 @@ async function captureVisibleTab(options = { format: "png" }) {
 async function submitPageAnnotation({ screenshotURL, name, annotations, email }) {
     // Prepare labels text file with the structure:
     // label,x,y,width,height\n
-    const labelsData = annotations.map(
-        ({ x, y, width, height, title }) =>
-            [title, x, y, width, height]).join("\n");
+    const labelsData = annotations.map(({ x, y, width, height, title }) => [title, x, y, width, height]).join("\n");
     const labelsBlob = new Blob([labelsData], { type: "text/plain" });
     const labelsFile = new File([labelsBlob], "labels.txt", {
         type: "text/plain",
@@ -105,7 +83,6 @@ async function submitPageAnnotation({ screenshotURL, name, annotations, email })
     return response;
 }
 
-
 // Messaging
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     const { action, payload } = message;
@@ -117,13 +94,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
 });
 
-
 // each handler must be an async fucntion or return a Promise
 const handlers = {
-    "LOGIN": loginGoogle,
-    "LOGOUT": logoutGoogle,
-    "CREATE_TAB": createTab,
-    "QUERY_TABS": queryTabs,
-    "CAPTURE_TAB": captureVisibleTab,
-    "CREATE_ANNOTATION": submitPageAnnotation
-}
+    LOGIN: loginGoogle,
+    LOGOUT: logoutGoogle,
+    CREATE_TAB: createTab,
+    QUERY_TABS: queryTabs,
+    CAPTURE_TAB: captureVisibleTab,
+    CREATE_ANNOTATION: submitPageAnnotation,
+};
