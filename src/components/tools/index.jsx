@@ -8,7 +8,6 @@ import { blobToDataURL } from "../../utils/blob";
 import { Camera, Download, DragHandle, RectangleTool, SendPlane, Spline } from "../icons";
 // import "./tools.css";
 
-
 const Tools = () => {
     const [user, setUser] = useStore.user();
     const [selectedTool, setSelectedTool] = useStore.selectedTool();
@@ -120,6 +119,8 @@ const Tools = () => {
                     save: false,
                     upload: true,
                 }),
+            styles: { cursor: "pointer" },
+            title: "Send to server"
         },
     ];
 
@@ -142,12 +143,9 @@ const Tools = () => {
                             </span>
                         </div>
                         <div className="annotator-tools__buttons">
-                            {tools.map(({ id, Icon, onClick, ref, onMouseOver, onMouseLeave, styles = {} }) => {
+                            {tools.map(({ id, Icon, onClick, styles = {}, ...rest }) => {
                                 return (
                                     <button
-                                        ref={ref}
-                                        onMouseEnter={onMouseOver}
-                                        // onMouseLeave={onMouseLeave}
                                         tabIndex={-1}
                                         key={`annotator-tool-${id}`}
                                         className={`tool-button${
@@ -160,6 +158,7 @@ const Tools = () => {
                                             })
                                         }
                                         style={styles}
+                                        {...rest}
                                     >
                                         <span className="tool-button__icon">{Icon}</span>
                                     </button>
