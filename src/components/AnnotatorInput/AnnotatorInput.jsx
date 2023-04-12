@@ -1,9 +1,9 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { render } from "preact";
 import Combobox from "../combobox";
 import { removeAnnotatorInput } from "../../lib/annotate";
 import Overlay from "../../lib/overlay";
-import { useSignal } from "@preact/signals";
+import { useSignal, signal } from "@preact/signals";
 
 import "./AnnotatorInput.css";
 import { findSimilarElements } from "../../lib/similar";
@@ -101,6 +101,12 @@ const Checkbox = ({ checked_signal }) => {
     );
 };
 
+let just_labels_signal = signal([]);
+
+chrome.storage.local.get(["labels"], function (result) {
+    just_labels_signal.value = result.labels || [];
+});
+
 const AnnotatorInput = (props) => {
     const {
         element,
@@ -110,60 +116,10 @@ const AnnotatorInput = (props) => {
         showAnnotateSimilar = true,
         showBoundingBox = true,
     } = props;
-    // const [items, setItems] = useState([{ title: "Hello", value: "Hello" }]);
+
     /** @type [{title: string, value: {x: string, y: string, id: string}[]}[], any]*/
     const [items, setItems] = useState(() => {
-        // let possible_items = [
-        //     "Section",
-        //     "Container",
-        //     "Image",
-        //     "GlyphIcon",
-        //     "Anchor/Link",
-        //     "Button",
-        //     "Social",
-        //     "Heading",
-        //     "Title",
-        //     "Description",
-        //     "Rich Description",
-        //     "Hero Banner",
-        //     "Carousel",
-        //     "Cards",
-        //     "Footer",
-        //     "Header",
-        //     "Menu",
-        //     "Navigation",
-        //     "Banner",
-        //     "Customers List",
-        //     "Partner List",
-        //     "Section",
-        //     "Container",
-        //     "Footer Links",
-        //     "Text",
-        //     "Featured Section",
-        //     "Picture Gallery",
-        //     "Value Section",
-        //     "Contact Us",
-        //     "Pricing",
-        //     "FAQ",
-        //     "Breadcrumbs",
-        //     "Tabs",
-        //     "Pagination",
-        //     "News letter",
-        //     "Testimonials",
-        //     "Logo Cloud",
-        // ];
-        
-        let possible_items = [
-            "Container",
-            "Section",
-            "Image",
-            "Link",
-            "Button",
-            "Social",
-            "Singleline text",
-            "Multiline text",
-            "Search/Input"
-        ]
+        let possible_items = just_labels_signal.value;
         let result = [];
 
         if (localStorage.getItem("items")) {
@@ -188,6 +144,10 @@ const AnnotatorInput = (props) => {
 
         if (input.trim() === "") {
             // delete the annotation if there is already annotated
+            return;
+        }
+
+        if (!items.some((item) => item.title == input)) {
             return;
         }
 
@@ -383,6 +343,10 @@ const AnnotatorInput = (props) => {
         let input = document.querySelector(".annotator-combobox__input").value;
 
         if (input.trim() === "") {
+            return;
+        }
+
+        if (!items.some((item) => item.title === input)) {
             return;
         }
 

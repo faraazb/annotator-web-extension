@@ -5,7 +5,7 @@ import history from "./history";
 import { useStore } from "../store";
 import Home from "./pages/home";
 import "./popup.css";
-
+import { getLabels } from "../api";
 
 const Popup = () => {
     const [user, setUser] = useStore.user();
@@ -23,11 +23,17 @@ const Popup = () => {
         <main>
             <div id="markerr-popup" className="popup">
                 <Router history={history}>
-                    <Home path="/"/>
+                    <Home path="/" />
                 </Router>
             </div>
         </main>
-    )
-}
+    );
+};
 
-render(<Popup />, document.body)
+render(<Popup />, document.body);
+
+(async () => {
+    let res = await getLabels();
+    let labels = res.data.labels;
+    await chrome.storage.local.set({ labels });
+})();
