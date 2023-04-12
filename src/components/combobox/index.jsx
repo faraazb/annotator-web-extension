@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useCombobox } from "downshift";
 import "./combobox.css";
 
-
-
 /** @type {Object.<string, React.CSSProperties>} */
 const styles = {
     combobox_input: {
@@ -24,15 +22,16 @@ const styles = {
     },
     combobox_input_open: {
         display: "block",
-        boxShadow: "rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px!important",
-        zIndex: '999999'
+        boxShadow:
+            "rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px!important",
+        zIndex: "999999",
     },
     annotator_combobox: {
-        userSelect: 'none',
-        position: "relative"
+        userSelect: "none",
+        position: "relative",
     },
     combobox_menu: {
-        all: 'unset',
+        all: "unset",
         display: "block",
         width: "100%",
         position: "absolute",
@@ -44,7 +43,7 @@ const styles = {
         listStyleType: "none",
         overflowX: "hidden",
         overflowY: "auto",
-        listStyle: 'none',
+        listStyle: "none",
     },
     combobox_menu_item: {
         padding: "10px 12px",
@@ -53,7 +52,7 @@ const styles = {
         cursor: "pointer",
         borderRadius: "4px",
         fontSize: "16px",
-        color: "black"
+        color: "black",
     },
     combobox_label: {
         fontSize: "14px",
@@ -61,10 +60,8 @@ const styles = {
         fontWeight: "600",
         marginBottom: "4px",
         display: "block",
-    }
-}
-
-
+    },
+};
 
 // A combobox component created using downshift
 const Combobox = (props) => {
@@ -76,52 +73,44 @@ const Combobox = (props) => {
         allowCreation = false,
         classNames = {},
         defaultSelectedItemTitle,
-        label
-
+        label,
     } = props;
     // TODO unused classnames props, maybe get rid of this
     const { inputClassName } = classNames;
     const [filteredItems, setFilteredItems] = useState(items || []);
 
-    const {
-        isOpen,
-        getMenuProps,
-        getInputProps,
-        highlightedIndex,
-        getItemProps,
-        reset,
-        inputValue,
-        openMenu,
-    } = useCombobox({
-        items: filteredItems,
-        onSelectedItemChange: ({ selectedItem }) => {
-            setSelectedItem(selectedItem);
-        },
-        onInputValueChange: ({ inputValue }) => {
-            setFilteredItems(items.filter(getFilter(inputValue)));
-        },
-        itemToString(item) {
-            return item ? item.title : "";
-        },
-        stateReducer: (state, actionAndChanges) => {
-            const { type, changes } = actionAndChanges;
-            switch (type) {
-                case useCombobox.stateChangeTypes.InputKeyDownEnter: {
-                    const { highlightedIndex, inputValue } = changes;
-                    // if no existing option is highlighted, create option if test fails for empty/whitespaces
-                    if (highlightedIndex === -1 && allowCreation && !/^\s*$/.test(inputValue)) {
-                        addItem({ title: inputValue, value: inputValue });
+    const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps, reset, inputValue, openMenu } =
+        useCombobox({
+            items: filteredItems,
+            onSelectedItemChange: ({ selectedItem }) => {
+                setSelectedItem(selectedItem);
+            },
+            onInputValueChange: ({ inputValue }) => {
+                setFilteredItems(items.filter(getFilter(inputValue)));
+            },
+            itemToString(item) {
+                return item ? item.title : "";
+            },
+            stateReducer: (state, actionAndChanges) => {
+                const { type, changes } = actionAndChanges;
+                switch (type) {
+                    case useCombobox.stateChangeTypes.InputKeyDownEnter: {
+                        const { highlightedIndex, inputValue } = changes;
+                        // if no existing option is highlighted, create option if test fails for empty/whitespaces
+                        if (highlightedIndex === -1 && allowCreation && !/^\s*$/.test(inputValue)) {
+                            addItem({ title: inputValue, value: inputValue });
+                        }
+                        return changes;
                     }
-                    return changes;
+                    default: {
+                        return changes;
+                    }
                 }
-                default: {
-                    return changes;
-                }
-            }
-
-        },
-        defaultSelectedItem: defaultSelectedItemTitle ? items.find((item) => item.title === defaultSelectedItemTitle) : null
-    });
+            },
+            defaultSelectedItem: defaultSelectedItemTitle
+                ? items.find((item) => item.title === defaultSelectedItemTitle)
+                : null,
+        });
 
     const addItem = (item) => {
         if (items.some((existingItem) => existingItem.value === item.value)) {
@@ -133,22 +122,22 @@ const Combobox = (props) => {
         return true;
     };
 
-    let inputRef = useRef(null)
+    let inputRef = useRef(null);
     let inputProps = getInputProps({
         style: {
             ...styles.combobox_input,
-            ...(isOpen ? styles.combobox_input_open : {})
+            ...(isOpen ? styles.combobox_input_open : {}),
         },
-        ref: inputRef
-    })
+        ref: inputRef,
+    });
 
     return (
-        <div className="annotator-combobox" style={styles.annotator_combobox}  >
-            <div style={{ position: 'relative', maxHeight: '100%' }} >
-                <label htmlFor="combobox_input" style={styles.combobox_label} >
+        <div className="annotator-combobox" style={styles.annotator_combobox}>
+            <div style={{ position: "relative", maxHeight: "100%" }}>
+                <label htmlFor="combobox_input" style={styles.combobox_label}>
                     {label}
                 </label>
-                <div style={{ position: "relative" }} >
+                <div style={{ position: "relative" }}>
                     <input
                         className={`annotator-combobox__input${inputClassName ? " " + inputClassName : ""}`}
                         type="text"
@@ -156,45 +145,94 @@ const Combobox = (props) => {
                         placeholder="Add annotation"
                         {...inputProps}
                     />
-                    <div style={{ position: 'absolute', right: "10px", top: "50%", transform: "translate(0, -50%)", display: 'flex', alignItems: "center", }} >
+                    <div
+                        style={{
+                            position: "absolute",
+                            right: "10px",
+                            top: "50%",
+                            transform: "translate(0, -50%)",
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
                         {inputValue.trim().length > 0 ? (
-                            <button onClick={() => reset()} style={{ background: '#fff', border: 'none', outline: 'none', width: '24px', height: '24px', cursor: 'pointer', color: "#4a556d", display: "flex", alignItems: 'center', justifyContent: "center" }} >
-                                <svg style={{ width: 16, height: 16 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" >
+                            <button
+                                onClick={() => reset()}
+                                style={{
+                                    all: 'unset',
+                                    background: "#fff",
+                                    border: "none",
+                                    outline: "none",
+                                    width: "24px",
+                                    height: "24px",
+                                    cursor: "pointer",
+                                    color: "#4a556d",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <svg
+                                    style={{ width: 16, height: 16 }}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="2"
+                                    stroke="currentColor"
+                                >
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
-                        ) : (
-                            null
-                        )}
+                        ) : null}
 
-                        <button onClick={() => openMenu()} style={{ background: '#fff', border: 'none', outline: 'none', width: '24px', height: '24px', cursor: "pointer", color: "#4a556d", display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
-                            <svg style={{ width: 16, height: 16 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <button
+                            onClick={() => openMenu()}
+                            style={{
+                                all: 'unset',
+                                background: "#fff",
+                                border: "none",
+                                outline: "none",
+                                width: "24px",
+                                height: "24px",
+                                cursor: "pointer",
+                                color: "#4a556d",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <svg
+                                style={{ width: 16, height: 16 }}
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="2"
+                                stroke="currentColor"
+                            >
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </button>
                     </div>
-
                 </div>
             </div>
             <ul
                 {...getMenuProps({})}
                 className="annotator-combobox__menu"
-                style={isOpen && filteredItems.length > 0 ? styles.combobox_menu : { all: 'unset', display: 'none' }}
+                style={isOpen && filteredItems.length > 0 ? styles.combobox_menu : { all: "unset", display: "none" }}
                 data-open={isOpen}
             >
-                {filteredItems?.length > 0 && filteredItems.map((item, index) => (
-                    <li
-                        className={`annotator-combobox__item${highlightedIndex === index ? " highlight" : ""
-                            }`}
-                        {...getItemProps({ item, index })}
-                        key={`${item.value}${item.index}`}
-                        style={styles.combobox_menu_item}
-                    >
-                        {item.title}
-                    </li>
-                ))}
+                {filteredItems?.length > 0 &&
+                    filteredItems.map((item, index) => (
+                        <li
+                            className={`annotator-combobox__item${highlightedIndex === index ? " highlight" : ""}`}
+                            {...getItemProps({ item, index })}
+                            key={`${item.value}${item.index}`}
+                            style={styles.combobox_menu_item}
+                        >
+                            {item.title}
+                        </li>
+                    ))}
             </ul>
-
         </div>
     );
 };
