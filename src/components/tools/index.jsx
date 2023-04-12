@@ -1,6 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
 import Draggable from "react-draggable";
-import { usePopper } from "react-popper";
 import toast from "react-hot-toast";
 import useScreenshot from "../../hooks/use-screenshot";
 import { exitInspectorMode, startInspectorMode } from "../../lib/annotate";
@@ -9,28 +8,13 @@ import { blobToDataURL } from "../../utils/blob";
 import { Camera, Download, DragHandle, RectangleTool, SendPlane, Spline } from "../icons";
 // import "./tools.css";
 
+
 const Tools = () => {
     const [user, setUser] = useStore.user();
     const [selectedTool, setSelectedTool] = useStore.selectedTool();
     const [open, setOpen] = useStore.toolsOpen();
-    const [screenshotMenuOpen, setScreenshotMenuOpen] = useState(false);
     const [screenshotId, takeScreenshot, screenshot, progress, splitted, error] = useScreenshot();
     const [upload, setUpload] = useState(false);
-
-    const [referenceElement, setReferenceElement] = useState(null);
-    const [popperElement, setPopperElement] = useState(null);
-    const [arrowElement, setArrowElement] = useState(null);
-    const { styles, attributes } = usePopper(referenceElement, popperElement, {
-        placement: "right",
-        modifiers: [
-            { name: "offset", options: { offset: [20, 12] } },
-            { name: "arrow", options: { element: arrowElement } },
-            {
-                name: "flip",
-                options: { fallbackPlacements: ["left", "right"] },
-            },
-        ],
-    });
 
     useEffect(() => {
         (async function () {
@@ -43,14 +27,14 @@ const Tools = () => {
                 }
             }
         })();
-        document.body.addEventListener("mouseenter", () => setScreenshotMenuOpen(false));
-
-        return () => {
-            document.body.removeEventListener("mouseenter", () => setScreenshotMenuOpen(false));
-        };
     }, []);
 
     const takeFullPageScreenshot = async (options = {}) => {
+        let items = JSON.parse(localStorage.getItem("items")) || [];
+        if (items.length === 0) {
+            toast.error("Please make some annotations first!");
+            return;
+        }
         const { save = true, upload = false, compress = true } = options;
         setUpload(upload);
         // disable pointer events to prevent hover styles
@@ -63,7 +47,7 @@ const Tools = () => {
 
         // hide tools menu
         setOpen(false);
-        setScreenshotMenuOpen(false);
+        // setScreenshotMenuOpen(false);
 
         const { ok, tabs } = await chrome.runtime.sendMessage({
             action: "QUERY_TABS",
@@ -130,12 +114,12 @@ const Tools = () => {
         { id: 3, Icon: <Spline /> },
         {
             id: 4,
-            Icon: <Camera />,
-            styles: { cursor: "default" },
-            onClick: () => {},
-            ref: setReferenceElement,
-            onMouseOver: () => setScreenshotMenuOpen(true),
-            onMouseLeave: () => setScreenshotMenuOpen(false),
+            Icon: <SendPlane />,
+            onClick: () =>
+                takeFullPageScreenshot({
+                    save: false,
+                    upload: true,
+                }),
         },
     ];
 
@@ -182,48 +166,6 @@ const Tools = () => {
                                 );
                             })}
                         </div>
-                        {screenshotMenuOpen && (
-                            <div
-                                id="annotator-screenshot-menu"
-                                ref={setPopperElement}
-                                style={styles.popper}
-                                {...attributes.popper}
-                            >
-                                <div ref={setArrowElement} style={styles.arrow} id="annotator-screenshot-menu-arrow" />
-                                <div
-                                    className="screenshot-sub-menu-hover"
-                                    onMouseEnter={() => setScreenshotMenuOpen(true)}
-                                ></div>
-                                <menu className="screenshot-sub-menu" onMouseLeave={() => setScreenshotMenuOpen(false)}>
-                                    <ul className="screenshot-sub-menu__items">
-                                        <li className="screenshot-sub-menu__item">
-                                            <button className="ss-menu-button" onClick={() => takeFullPageScreenshot()}>
-                                                <span className="ss-menu-button__icon">
-                                                    <Download />
-                                                </span>
-                                                Save locally
-                                            </button>
-                                        </li>
-                                        <li className="screenshot-sub-menu__item">
-                                            <button
-                                                className="ss-menu-button"
-                                                onClick={() =>
-                                                    takeFullPageScreenshot({
-                                                        save: false,
-                                                        upload: true,
-                                                    })
-                                                }
-                                            >
-                                                <span className="ss-menu-button__icon">
-                                                    <SendPlane />
-                                                </span>
-                                                Send to server
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </menu>
-                            </div>
-                        )}
                     </div>
                 </Draggable>
             )}
