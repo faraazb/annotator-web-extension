@@ -1,4 +1,4 @@
-import { createAnnotation } from "./api";
+import { createAnnotation, createUser } from "./api";
 import { getUserInfo, login, logout } from "./oauth";
 import { dataURLtoFile } from "./utils/blob";
 
@@ -8,8 +8,13 @@ async function loginGoogle() {
         // TODO token is unused in getUserInfo
         const result = await getUserInfo(token);
         if (result) {
-            await chrome.storage.local.set({ user: result });
-            return { ok: true, data: result };
+            const { email } = result;
+            // create user on server
+            const { ok, data } = await createUser({ email });
+            if (ok || data.msg.includes("already registered")) {
+                await chrome.storage.local.set({ user: result });
+                return { ok: true, data: result };
+            }
         }
         return { ok: false };
     } catch (err) {

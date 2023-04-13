@@ -22,12 +22,7 @@ const Home = () => {
     const loginWithGoogle = async () => {
         const response = await chrome.runtime.sendMessage({ action: "LOGIN" });
         if (response.ok) {
-            const { email } = response.data;
-            // create user on server
-            const { ok, data } = await createUser({ email });
-            if (ok || data.msg.includes("already registered")) {
-                setUser(response.data);
-            }
+            setUser(response.data);
         }
     };
 
