@@ -1,0 +1,4 @@
+theme: tactile
+show_downloads: true
+downloads:
+  zip_url: https://github.com/faraazb/annotator-web-extension/releases/latest/download/annotator-web-extension.zip
