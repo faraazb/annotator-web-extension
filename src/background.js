@@ -69,7 +69,7 @@ async function captureVisibleTab(options = { format: "png" }) {
  * @param {number} annotations[].width
  * @param {number} annotations[].height
  */
-async function submitPageAnnotation({ screenshotURL, name, annotations, email }) {
+async function submitPageAnnotation({ screenshotURL, name, annotations, email, url }) {
     // Prepare labels text file with the structure:
     // label,x,y,width,height\n
     const labelsData = annotations.map(({ x, y, width, height, title }) => [title, x, y, width, height]).join("\n");
@@ -84,6 +84,7 @@ async function submitPageAnnotation({ screenshotURL, name, annotations, email })
         screenshot: dataURLtoFile(screenshotURL, name),
         annotations: labelsFile,
         email,
+        url,
     });
     return response;
 }

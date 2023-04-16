@@ -1,3 +1,5 @@
+import { convertFileSize } from "./utils/blob";
+
 class API {
     constructor({ baseUrl, options }) {
         this.baseUrl = baseUrl || "";
@@ -48,7 +50,8 @@ const routes = {
     createUser: "/create-user",
     leaderboard: "/scoreboard",
     labels: "/labels",
-    submit: "/submit"
+    submit: "/submissions",
+    submitConfirm: "/submissions/confirm",
 }
 
 
@@ -74,23 +77,25 @@ const createUser = async ({ email }) => {
  * @param {File} annotations
  * @param {string} email
  */
-const createAnnotation = async ({ screenshot, annotations, email }) => {
-
-    const formData = new FormData();
-    formData.append("label", annotations);
-    formData.append("image", screenshot);
-
-    // console.log(Array.from(formData.entries()))
-    // console.log(user.email)
+const createAnnotation = async ({ screenshot, annotations, email, url }) => {
+    const headers = { ...api.options.headers, email };
+    const { data, ok } = await api.post(routes.submit, { headers, body: { url } });
+    if (!ok) {
+        return { ok: false }
+    }
     // console.log(convertFileSize(screenshot.size))
+    const { id, labels, image } = data;
 
-    // header object is overwritten, no application/json for this one
-    return await api.post(routes.submit, {
-        mode: "cors",
-        headers: { "email": email },
-        redirect: "follow",
-        body: formData
-    });
+    try {
+        await Promise.all([
+            fetch(labels.uploadURL, { method: "PUT", body: annotations }),
+            fetch(image.uploadURL, { method: "PUT", body: screenshot })
+        ]);
+        const { data, ok } = await api.post(routes.submitConfirm, { headers, body: { id, url } });
+        return { ok };
+    } catch (error) {
+        return { ok: false, error: error.message }
+    }
 }
 
 export {
