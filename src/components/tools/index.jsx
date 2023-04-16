@@ -41,6 +41,18 @@ const Tools = () => {
         // disable pointer events to prevent hover styles
         document.body.style.pointerEvents = "none";
 
+        document.getElementById("annotator-app-container").style.visibility = "hidden";
+        const elements = document.querySelectorAll("[data-annotate-id]");
+        [...elements]
+            .map((item) => item.getAttribute("data-annotate-id"))
+            .map((item) => `data-annotate-id-${item}`)
+            .map((item) => {
+                return document.getElementById(item);
+            })
+            .forEach((item) => {
+                item.style.visibility = "hidden";
+            });
+
         if (selectedTool === TOOLS.ELEMENT_PICKER) {
             // stop element inspector
             exitInspectorMode();
@@ -135,6 +147,18 @@ const Tools = () => {
         if (progress === 1) {
             setOpen(true);
             document.body.style.pointerEvents = "auto";
+
+            document.getElementById("annotator-app-container").style.visibility = "visible";
+            const elements = document.querySelectorAll("[data-annotate-id]");
+            [...elements]
+                .map((item) => item.getAttribute("data-annotate-id"))
+                .map((item) => `data-annotate-id-${item}`)
+                .map((item) => {
+                    return document.getElementById(item);
+                })
+                .forEach((item) => {
+                    item.style.visibility = "visible";
+                });
         }
     }, [progress]);
 
