@@ -43,18 +43,23 @@ const useScreenshot = () => {
         }
         let screenshotBlobs = blobs;
         if (compress) {
-            screenshotBlobs = [];
-            for (const { blob, name } of blobs) {
-                // console.log(convertFileSize(blob.size))
+            try {
+                screenshotBlobs = [];
+                for (const { blob, name } of blobs) {
+                    // console.log(convertFileSize(blob.size))
+                    const { fullWidth, fullHeight } = CaptureAPI.getDimensions();
+                    // scale larger side down by 75%
+                    let max = (fullHeight > fullWidth ? fullHeight : fullWidth) * 0.75;
+                    // console.log(fullHeight, fullWidth, max)
 
-                const { fullWidth, fullHeight } = CaptureAPI.getDimensions();
-                // scale larger side down by 75%
-                let max = (fullHeight > fullWidth ? fullHeight : fullWidth) * 0.75;
-                // console.log(fullHeight, fullWidth, max)
-
-                const compressedBlob = await imageBlobReduce().toBlob(blob, { max: max });
-                // console.log(convertFileSize(compressedBlob.size))
-                screenshotBlobs.push({ blob: compressedBlob, name });
+                    const compressedBlob = await imageBlobReduce().toBlob(blob, { max: max });
+                    // console.log(convertFileSize(compressedBlob.size))
+                    screenshotBlobs.push({ blob: compressedBlob, name });
+                }
+            } catch (error) {
+                // if compression fails fallback to uncompressed blobs
+                console.log("Annotator: Compression failed")
+                screenshotBlobs = blobs;
             }
         }
 
@@ -63,7 +68,7 @@ const useScreenshot = () => {
         setId(screenshotId);
         setScreenshot(screenshotBlobs)
 
-        const files = [];
+        // const files = [];
 
         // Save each file, triggers browser's multiple save permission box
 

@@ -5,13 +5,15 @@ import useScreenshot from "../../hooks/use-screenshot";
 import { exitInspectorMode, startInspectorMode } from "../../lib/annotate";
 import { TOOLS, useStore } from "../../store";
 import { blobToDataURL } from "../../utils/blob";
-import { Camera, Download, DragHandle, RectangleTool, SendPlane, Spline } from "../icons";
+import { DragHandle, RectangleTool, SendPlane, Spline } from "../icons";
 // import "./tools.css";
+
 
 const Tools = () => {
     const [user, setUser] = useStore.user();
     const [selectedTool, setSelectedTool] = useStore.selectedTool();
     const [open, setOpen] = useStore.toolsOpen();
+    const [screenshotEnabled, setScreenshotEnabled] = useState(true);
     const [screenshotId, takeScreenshot, screenshot, progress, splitted, error] = useScreenshot();
     const [upload, setUpload] = useState(false);
 
@@ -56,15 +58,16 @@ const Tools = () => {
             exitInspectorMode();
         }
 
-        // hide tools menu
-        setOpen(false);
-        // setScreenshotMenuOpen(false);
-
         const { ok, tabs } = await chrome.runtime.sendMessage({
             action: "QUERY_TABS",
             payload: { active: true, currentWindow: true },
         });
         if (ok) {
+            // hide tools menu
+            setOpen(false);
+            // disbale screenshot button
+            setScreenshotEnabled(false);
+
             // TODO the screenshot blob/file simply can't be returned here
             // because everything in the capture-api is callback based
             await takeScreenshot({
@@ -105,6 +108,7 @@ const Tools = () => {
                         name: screenshot[0].name,
                         annotations: labels,
                         email: user.email,
+                        url: window.location.href,
                     },
                 });
                 if (result.ok) {
@@ -117,6 +121,7 @@ const Tools = () => {
                     });
                 }
             }
+            setScreenshotEnabled(true);
         })();
     }, [screenshot]);
 
@@ -130,9 +135,10 @@ const Tools = () => {
                 takeFullPageScreenshot({
                     save: false,
                     upload: true,
+                    compress: true,
                 }),
-            styles: { cursor: "pointer" },
             title: "Send to server",
+            disabled: !screenshotEnabled,
         },
     ];
 
@@ -181,7 +187,6 @@ const Tools = () => {
                                                 setSelectedTool(id);
                                             })
                                         }
-                                        style={styles}
                                         {...rest}
                                     >
                                         <span className="tool-button__icon">{Icon}</span>

@@ -44,12 +44,20 @@
     margin-bottom: 5px;
 } */
 
-.tool-button:not(.tool-button--selected):hover {
+.tool-button:not(.tool-button--selected):not(:disabled):hover {
     background: #4c5f6f;
 }
 
 .tool-button--selected {
     background: #7234cd;
+}
+
+.tool-button:disabled .tool-button__icon > .icon {
+    fill: #5c5c5c;
+}
+
+.tool-button:disabled {
+    cursor: not-allowed;
 }
 
 .tool-button__icon {
