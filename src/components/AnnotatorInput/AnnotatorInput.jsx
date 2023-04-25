@@ -198,13 +198,20 @@ const AnnotatorInput = (props) => {
             ele.setAttribute("data-annotate-title", input);
             ele.setAttribute("data-annotate-value", JSON.stringify({ x, y }));
 
-            xys.push({
+            let paddingTop = parseInt(window.getComputedStyle(ele).paddingTop, 10) || 0;
+            let paddingBottom = parseInt(window.getComputedStyle(ele).paddingBottom, 10) || 0;
+            let paddingLeft = parseInt(window.getComputedStyle(ele).paddingLeft, 10) || 0;
+            let paddingRight = parseInt(window.getComputedStyle(ele).paddingRight, 10) || 0;
+
+            let obj = {
                 x,
                 y,
                 id,
-                width: ele.getBoundingClientRect().width,
-                height: ele.getBoundingClientRect().height,
-            });
+                width: ele.getBoundingClientRect().width - paddingLeft - paddingRight,
+                height: ele.getBoundingClientRect().height - paddingTop - paddingBottom,
+            };
+
+            xys.push(obj);
 
             let element_styels = window.getComputedStyle(ele);
 
@@ -215,10 +222,6 @@ const AnnotatorInput = (props) => {
 
             let app_container = document.querySelector("#annotator-app-container");
             app_container.appendChild(div);
-
-            let paddingTop = parseInt(window.getComputedStyle(ele).paddingTop, 10) || 0;
-            let paddingLeft = parseInt(window.getComputedStyle(ele).paddingLeft, 10) || 0;
-            // let paddingBottom = parseInt(window.getComputedStyle(ele).paddingBottom, 10) || 0;
 
             render(
                 <p className="stroke-single" title={input}>
