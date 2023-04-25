@@ -109,6 +109,11 @@ const Tools = () => {
                         annotations: labels,
                         email: user.email,
                         url: window.location.href,
+                        clientProperties: {
+                            devicePixelRatio: window.devicePixelRatio,
+                            docElScrollHeight: document.documentElement?.scrollHeight,
+                            docElScrollWidth: document.documentElement?.scrollWidth,
+                        },
                     },
                 });
                 if (result.ok) {
@@ -135,7 +140,7 @@ const Tools = () => {
                 takeFullPageScreenshot({
                     save: false,
                     upload: true,
-                    compress: true,
+                    compress: false,
                 }),
             title: "Send to server",
             disabled: !screenshotEnabled,

@@ -77,7 +77,7 @@ const createUser = async ({ email }) => {
  * @param {File} annotations
  * @param {string} email
  */
-const createAnnotation = async ({ screenshot, annotations, email, url }) => {
+const createAnnotation = async ({ screenshot, annotations, email, url, clientProperties }) => {
     const headers = { ...api.options.headers, email };
     const { data, ok } = await api.post(routes.submit, { headers, body: { url } });
     if (!ok) {
@@ -91,7 +91,7 @@ const createAnnotation = async ({ screenshot, annotations, email, url }) => {
             fetch(labels.uploadURL, { method: "PUT", body: annotations }),
             fetch(image.uploadURL, { method: "PUT", body: screenshot })
         ]);
-        const { data, ok } = await api.post(routes.submitConfirm, { headers, body: { id, url } });
+        const { data, ok } = await api.post(routes.submitConfirm, { headers, body: { id, url, clientProperties } });
         return { ok };
     } catch (error) {
         return { ok: false, error: error.message }
