@@ -204,8 +204,8 @@ const AnnotatorInput = (props) => {
             let paddingRight = parseInt(window.getComputedStyle(ele).paddingRight, 10) || 0;
 
             let obj = {
-                x,
-                y,
+                x: x + paddingLeft,
+                y: y + paddingTop,
                 id,
                 width: ele.getBoundingClientRect().width - paddingLeft - paddingRight,
                 height: ele.getBoundingClientRect().height - paddingTop - paddingBottom,
