@@ -50,6 +50,7 @@ const Tools = () => {
                 return document.getElementById(item);
             })
             .forEach((item) => {
+                console.log(item);
                 item.style.visibility = "hidden";
             });
 
@@ -90,11 +91,20 @@ const Tools = () => {
                 const toastId = toast.loading("Sending to server...");
                 let items = JSON.parse(localStorage.getItem("items"));
 
+                // let scale = 1;
+                // if (window.devicePixelRatio > 1) {
+                //     scale = window.devicePixelRatio
+                // }
+                let scale = window.devicePixelRatio
+
                 let labels = items
                     .map((item) => {
-                        return item.value.map(({ id, ...rest }) => ({
+                        return item.value.map(({ id, x, y, width, height }) => ({
                             title: item.title,
-                            ...rest,
+                            x: x * scale,
+                            y: y * scale,
+                            height: height * scale,
+                            width: width * scale,
                         }));
                     })
                     .reduce((prev, curr) => [...prev, ...curr], []);
